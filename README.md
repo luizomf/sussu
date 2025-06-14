@@ -126,6 +126,7 @@ A partir do modelo `medium`, é bem provável que você perceba uma **queda absu
 ---
 
 **`--output_dir` ou `-o`:** o caminho da pasta onde as transcrições serão salvas. Padrão é na raiz do projeto (`.`).
+
 **`--output_format` ou `-f`:** o formato da transcrição (ou legenda) que deseja. Opções: `txt`, `vtt`, `srt`, `tsv`, `json` e `all` (todos). O padrão é `all` (todos).
 
 ---
