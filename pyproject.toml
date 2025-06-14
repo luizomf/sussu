@@ -10,6 +10,7 @@ dependencies = ["openai-whisper>=20240930"]
 
 [project.urls]
 Homepage = "https://www.otaviomiranda.com.br/"
+Repository = "https://github.com/luizomf/sussu"
 
 [project.scripts]
 sussu = "sussu.cli:run"
