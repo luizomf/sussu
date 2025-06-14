@@ -86,6 +86,18 @@ O `whisper` usa o `argparse` do Python para criar essa `help` maravilhosa. Caso 
 
 ### Argumentos essenciais do `whisper`
 
+**`audio`:** este é um argumento posicional que representa o caminho do vídeo ou áudio que será transcrito.
+
+Exemplo:
+
+```sh
+whisper /caminho/do/arquivo.mp4
+```
+
+Não especifiquei nada além de um caminho de vídeo no comando acima, abaixo detalho as opções que mais uso.
+
+---
+
 **`--model MODEL`:** define qual o modelo será utilizado na transcrição do áudio. É opcional, e o valor padrão é `turbo`. Este model funciona muito bem, é rápido e multilíngue, mas requer cerca de **6GB de VRAM** para funcionar.
 
 Talvez você queira usar outros modelos que usam mais ou menos recursos do seu hardware, ou que possuem mais ou menos parâmetros (como `base`, `small`, `medium`, etc).
@@ -106,5 +118,100 @@ Nesse caso, o fator limitador passa a ser a **quantidade total de memória dispo
 Por exemplo: se você tem apenas 8GB de RAM, o ideal é testar os modelos `tiny`, `base` ou `small`.
 
 A partir do modelo `medium`, é bem provável que você perceba uma **queda absurda no desempenho geral da máquina**, já que a memória será completamente consumida.
+
+---
+
+**`--device DEVICE`:** se você tem uma placa de vídeo NVIDIA com driver CUDA e versão compatível com o PyTorch, vale a pena usar `--device cuda`, do contrário nem se preocupe em mexer com essa opção. Padrão é `cpu`.
+
+---
+
+**`--output_dir` ou `-o`:** o caminho da pasta onde as transcrições serão salvas. Padrão é na raiz do projeto (`.`).
+**`--output_format` ou `-f`:** o formato da transcrição (ou legenda) que deseja. Opções: `txt`, `vtt`, `srt`, `tsv`, `json` e `all` (todos). O padrão é `all` (todos).
+
+---
+
+**`--task`:** você pode transcrever ou traduzir um áudio para inglês. O padrão é transcrever no idioma que está sendo falado no áudio. Opções `transcribe` (transcrever) ou `translate` (traduzir para inglês).
+
+---
+
+**`--language`:** o idioma falado no áudio. São muitas opções (veja abaixo). O `whisper` é capaz de detectar o idioma falado no vídeo se essa opção não for enviada.
+
+Forma curta (language code):
+
+```python
+["af", "am", "ar", "as", "az", "ba", "be", "bg", "bn", "bo", "br", "bs", "ca",
+"cs", "cy", "da", "de", "el", "en", "es", "et", "eu", "fa", "fi", "fo", "fr",
+"gl", "gu", "ha", "haw", "he", "hi", "hr", "ht", "hu", "hy", "id", "is", "it",
+"ja", "jw", "ka", "kk", "km", "kn", "ko", "la", "lb", "ln", "lo", "lt", "lv",
+"mg", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "ne", "nl", "nn", "no",
+"oc", "pa", "pl", "ps", "pt", "ro", "ru", "sa", "sd", "si", "sk", "sl", "sn",
+"so", "sq", "sr", "su", "sv", "sw", "ta", "te", "tg", "th", "tk", "tl", "tr",
+"tt", "uk", "ur", "uz", "vi", "yi", "yo", "yue", "", "zh"]
+```
+
+Forma longa (language name):
+
+```python
+["Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Assamese",
+"Azerbaijani", "Bashkir", "Basque", "Belarusian", "Bengali", "Bosnian",
+"Breton", "Bulgarian", "Burmese", "Cantonese", "Castilian", "Catalan",
+"Chinese", "Croatian", "Czech", "Danish", "Dutch", "English", "Estonian",
+"Faroese", "Finnish", "Flemish", "French", "Galician", "Georgian", "German",
+"Greek", "Gujarati", "Haitian", "Haitian Creole", "Hausa", "Hawaiian", "Hebrew",
+"Hindi", "Hungarian", "Icelandic", "Indonesian", "Italian", "Japanese",
+"Javanese", "Kannada", "Kazakh", "Khmer", "Korean", "Lao", "Latin", "Latvian",
+"Letzeburgesch", "Lingala", "Lithuanian", "Luxembourgish", "Macedonian",
+"Malagasy", "Malay", "Malayalam", "Maltese", "Mandarin", "Maori", "Marathi",
+"Moldavian", "Moldovan", "Mongolian", "Myanmar", "Nepali", "Norwegian",
+"Nynorsk", "Occitan", "Panjabi", "Pashto", "Persian", "Polish", "Portuguese",
+"Punjabi", "Pushto", "Romanian", "Russian", "Sanskrit", "Serbian", "Shona",
+"Sindhi", "Sinhala", "Sinhalese", "Slovak", "Slovenian", "Somali", "Spanish",
+"Sundanese", "Swahili", "Swedish", "Tagalog", "Tajik", "Tamil", "Tatar",
+"Telugu", "Thai", "Tibetan", "Turkish","Turkmen", "Ukrainian", "Urdu", "Uzbek",
+"Valencian", "Vietnamese", "Welsh", "Yiddish", "Yoruba"]
+```
+
+Já coloquei tudo com aspas e em uma lista para facilitar a sua vida. Mesmo assim, se quiser um
+dicionário pronto, está em `whisper.tokenizer.LANGUAGES`.
+
+---
+
+**`--temperature`:** controla a "criatividade" do modelo. Vai de `0.0` a `1.0`. Quanto mais alto, mais liberdade o modelo tem pra decidir os próximos tokens. Esse parâmetro interage com `--beam_size`, `--patience` e `--best_of`.
+
+**`--beam_size`:** número de hipóteses que o modelo mantém em paralelo. Pensa como se ele testasse vários caminhos ao mesmo tempo e no fim escolhesse o melhor. O padrão é `5` e **só funciona se `--temperature == 0.0`**.
+
+**`--patience`:** fator de tolerância que faz o modelo continuar explorando novas hipóteses mesmo depois de achar uma aceitável. Requer `--temperature == 0.0` e `--beam_size > 1`.
+
+**`--best_of`:** número de amostras diferentes geradas antes de escolher a melhor. Funciona apenas quando `--temperature > 0.0`.
+
+**Cola rápida:**
+
+```
+- temperature > 0 → usa sampling
+  ✅ best_of 5 (5 amostras)
+  🔴 beam_size (ignorado)
+  🔴 patience (ignorado)
+
+- temperature == 0 → usa beam search
+  ✅ --beam_size 5 (5 hipóteses)
+  ✅ --patience 2 (2 x 5 = 10 hipóteses)
+  🔴 best_of (ignorado)
+
+- temperature == 0 → greedy
+  ✅ --beam_size 1 (1 hipótese)
+  🔴 --patience (não faz diferença)
+  🔴 best_of (ignorado)
+```
+
+**Observação sincera:**
+
+Na prática, o modelo vai responder como foi treinado, independente do seu capricho nas configs. Trocar `temperature`, `beam_size`, `patience` e afins pode virar desperdício de tempo.
+
+**Recomendação direta:** só mexa nessas opções se:
+
+* o modelo começar a repetir palavras (loop)
+* estiver errando demais em blocos grandes
+
+Se for só por causa de uma ou duas palavras... aceita e segue. Ou então faz igual eu: **testa tudo por uma semana e conclui que o padrão já era bom** 😅
 
 ---
