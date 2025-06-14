@@ -12,6 +12,10 @@ Por isso, vamos começar pela **instalação** do projeto, o que vai disponibili
 
 ## Instalação do `sussu`
 
+Caso tenha dificuldades com o ambiente, recomendo meu tutorial:
+
+- [Ambiente Python Moderno 2025: UV, Ruff, Pyright, pyproject.toml e VS Code](https://www.youtube.com/watch?v=HuAc85cLRx0)
+
 Este projeto usa o `Python 3.11.9` por questões de compatibilidade com o Whisper. Evite alterar essa versão caso não saiba o que está fazendo, porque eu **já testei tudo para você**.
 
 Além disso, este projeto também usa o [uv](https://docs.astral.sh/uv/) no gerenciamento geral (pacotes, versão do Python, etc).
