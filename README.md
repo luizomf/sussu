@@ -15,5 +15,28 @@ Este projeto usa o `Python 3.11.9` por questões de compatibilidade com o Whispe
 Além disso, este projeto também usa o [uv](https://docs.astral.sh/uv/) no gerenciamento geral (pacotes, versão do Python, etc).
 
 ```sh
-# comandos virão aqui
+uv sync  # é só isso mesmo 😅
 ```
+
+`uv sync` é suficiente para:
+
+- Baixar e instalar o `python 3.11.9`
+- Criar o ambiente virtual em `.venv`
+- Instalar os pacotes necessários
+- Buildar o `whisper` e o `sussu`
+
+---
+
+## Rodando pela primeira vez
+
+Para testar se tudo funcionou perfeitamente você pode tanto **ativar o ambiente virtual** quanto usar **`uv run`**. Teste com `whisper -h`. Isso deve mostrar a `help` completa do `whisper`. Exemplos:
+
+```sh
+uv run whisper -h
+# Ou se estiver com o ambiente virtual ativo
+whisper -h
+```
+
+**Observação:** alguns editores como VS Code ou Zed, ativam seu ambiente virtual automaticamente ao abrir uma nova instância do terminal se tudo estiver configurado corretamente, basta sair (`exit`) e abrir novamente o terminal.
+
+---
