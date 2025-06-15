@@ -331,6 +331,28 @@ Isso pode ajudar o modelo a reconhecer e transcrever termos técnicos de program
 > "Tem 300 mil pessoas te esperando, detona lá!"
 > Ele vai subir já no clima certo, mas o resto da performance dependerá do show em si. Da mesma forma, o modelo continua a transcrição com base no que "ouviu" e transcreveu depois do prompt inicial.
 
+**Cuidados com o `--initial_prompt`**:
+
+O `--initial_prompt` pode afetar significativamente a forma como o modelo do `whisper` opera. Em alguns casos, ele pode levar à geração de legendas excessivamente longas ou até mesmo fazer o modelo entrar em **loops de repetição**.
+
+**Recomendação:** Antes de aplicar um prompt em um vídeo completo, faça **testes rápidos em um trecho menor** do seu vídeo para observar o resultado. Isso evita surpresas e economiza tempo de processamento.
+
+Para cortar facilmente um pedaço do seu vídeo para testes, você pode usar o `ffmpeg` com o seguinte comando:
+
+```bash
+ffmpeg -i entrada.mp4 -c:v copy -c:a copy -ss 00:05:00.000 -to 00:10:00.000 saida.mp4
+```
+
+**Entendendo o Comando `ffmpeg`:**
+
+* `-i entrada.mp4`: Define o arquivo de vídeo de entrada (o seu vídeo original).
+* `-c:v copy`: Copia o codec de vídeo do arquivo original, sem recodificar. Isso torna o processo muito mais rápido!
+* `-c:a copy`: Copia o codec de áudio do arquivo original, também sem recodificar.
+* `-ss 00:05:00.000`: Especifica o ponto de início do corte (neste exemplo, 5 minutos e 0 segundos do vídeo original).
+* `-to 00:10:00.000`: Define o ponto final do corte (neste exemplo, 10 minutos e 0 segundos do vídeo original).
+
+Este comando irá gerar um novo arquivo de vídeo (`saida.mp4`) contendo apenas o segmento entre 00:05:00 e 00:10:00 do vídeo original. Essa técnica é extremamente útil, especialmente para vídeos mais longos (como os meus de 30+ minutos), pois permite testar configurações específicas em um pedaço pequeno sem ter que processar o vídeo inteiro.
+
 ---
 
 **`--condition_on_previous_text`**:
