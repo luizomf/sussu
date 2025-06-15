@@ -145,7 +145,6 @@ whisper /caminho/do/seu/arquivo.mp4 --model large-v2 --device cpu
 
 **`--output_format` ou `-f`**: Permite que você escolha o **formato da transcrição ou legenda** gerada. As opções disponíveis são: `txt`, `vtt`, `srt`, `tsv`, `json` e `all` (que gera todos os formatos). O padrão é `all`.
 
-
 **Exemplo:**
 
 O arquivo de saída será `srt` (SubRip) na pasta indicada em `-o`. Essa pasta será criada caso não exista.
@@ -209,7 +208,6 @@ Forma longa (language name):
 
 Se precisar de um dicionário completo com todos os idiomas e seus códigos, ele está disponível em `whisper.tokenizer.LANGUAGES` dentro do código do `whisper`.
 
-
 **Exemplo:**
 
 ```bash
@@ -220,7 +218,6 @@ Se precisar de um dicionário completo com todos os idiomas e seus códigos, ele
 # Idioma falado no vídeo "Português"
 whisper /caminho/do/seu/arquivo.mp4 --language pt
 ```
-
 
 ---
 
@@ -280,6 +277,36 @@ whisper /caminho/do/seu/arquivo.mp4 --temperature 0.0 --beam_size 3
 whisper /caminho/do/seu/arquivo.mp4 --temperature 0.7 --best_of 5
 ```
 
-**`--temperature_increment_on_fallback`**: Este argumento permite que você **aumente a temperatura do modelo em casos de falha na transcrição**. Se o modelo encontrar dificuldades na temperatura `0.0`, ele fará um "fallback" e tentará com a temperatura incrementada. O valor também varia de `0.0` a `1.0`. No entanto, **cuidado: definir `0.0` para este argumento causará um erro `ZeroDivisionError: float division by zero`** (isso pode ser um pequeno "bugzinho" 🫣, mas, de fato, não faria muito sentido usar zero aqui, já que o objetivo é justamente *incrementar* a temperatura). O valor padrão é `0.2`.
+**`--temperature_increment_on_fallback`**: Este argumento permite que você **aumente a temperatura do modelo em casos de falha na transcrição**. Se o modelo encontrar dificuldades na temperatura `0.0`, ele fará um "fallback" e tentará com a temperatura incrementada. O valor também varia de `0.0` a `1.0`. No entanto, **cuidado: definir `0.0` para este argumento causará um erro `ZeroDivisionError: float division by zero`** (isso pode ser um pequeno "bugzinho" 🫣, mas, de fato, não faria muito sentido usar zero aqui, já que o objetivo é justamente _incrementar_ a temperatura). O valor padrão é `0.2`.
+
+---
+
+**`--max_line_width`**: Define a **quantidade máxima de caracteres por linha** na sua legenda. O valor padrão é `1000` (um limite bastante alto, codificado diretamente na classe `SubtitlesWriter` do `whisper`). Eu, particularmente, costumo usar `45` para uma melhor legibilidade. **Importante:** Se este argumento for utilizado, ele anula o `--max_words_per_line`. **Requer `--word_timestamps True`**.
+
+**`--max_line_count`**: Controla a **quantidade máxima de linhas por legenda** (ou "bloco" de texto). Eu uso o valor `2`, mas, nos meus testes, percebi que isso força todas as legendas a terem sempre duas linhas. Para mim, não é um problema, mas vale a pena você testar para ver como se adapta ao seu caso. **Requer `--word_timestamps True`**.
+
+**`--max_words_per_line`**: Determina a **quantidade máxima de palavras por linha** na legenda. O padrão também é um valor alto, `1000` (também "hardcoded" na classe `SubtitlesWriter`). Embora eu não costume usá-lo, acredito que `5` palavras por linha pode resultar em uma leitura mais confortável. **Atenção:** Será anulado por `--max_line_width` caso você use ambos no mesmo comando. **Requer `--word_timestamps True`**.
+
+**`--highlight_words`**: Este é o argumento responsável por criar o **efeito de "karaokê"** na sua transcrição. Ele faz com que cada palavra falada seja sublinhada no momento exato em que é pronunciada. **Requer `--word_timestamps True`**.
+
+**`--word_timestamps`**: Este argumento é a **chave** para ativar os recursos de sincronização detalhada. Ao defini-lo como `True`, o modelo passará a gerar **timestamps para cada palavra**, em vez de apenas por blocos de frase. Isso pode, sim, aumentar consideravelmente o tempo de transcrição, mas é um requisito fundamental para que vários outros argumentos (como os de formatação de linha e destaque de palavras) funcionem. O valor padrão é `False`.
+
+**Exemplo Completo de Transcrição Detalhada**
+
+Veja um exemplo de como combinar vários desses argumentos para obter uma transcrição formatada e com destaque de palavras:
+
+```bash
+# A '\' (barra invertida no final da linha) é usada apenas para indicar que
+# o comando continua na linha de baixo. Isso é uma boa prática para evitar
+# que o comando fique muito longo na horizontal e melhora a legibilidade.
+whisper meu_video.mp4 \
+  --model large-v2 \
+  --language pt \
+  --output_format srt \
+  --word_timestamps True \
+  --highlight_words True \
+  --max_line_width 45 \
+  --max_line_count 2
+```
 
 ---
