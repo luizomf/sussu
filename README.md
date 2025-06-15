@@ -94,7 +94,7 @@ Vamos começar com os argumentos que você usará com mais frequência:
 
 **`audio`**: Este é o **argumento posicional** principal. Ele representa o caminho completo (localização) do arquivo de áudio ou vídeo que você quer transcrever.
 
-Exemplo:
+**Exemplo:**
 
 ```bash
 whisper /caminho/do/seu/arquivo.mp4
@@ -123,9 +123,21 @@ Nesses casos, o que realmente limita é a **quantidade total de memória RAM dis
 
 A partir do modelo `medium`, é bem provável que você perceba uma **queda drástica no desempenho geral da sua máquina**, já que a memória será completamente consumida.
 
+**Exemplo:**
+
+```bash
+whisper /caminho/do/seu/arquivo.mp4 --model large-v2
+```
+
 ---
 
 **`--device DEVICE`**: Este argumento é para você que possui uma **placa de vídeo NVIDIA com drivers CUDA** e uma versão compatível com o PyTorch. Se for o seu caso, vale a pena usar `--device cuda` para aproveitar o processamento da GPU. Caso contrário, não se preocupe em alterar esta opção, o padrão é `cpu` (processamento pela CPU) e funcionará perfeitamente.
+
+**Exemplo:**
+
+```bash
+whisper /caminho/do/seu/arquivo.mp4 --model large-v2 --device cpu
+```
 
 ---
 
@@ -133,9 +145,24 @@ A partir do modelo `medium`, é bem provável que você perceba uma **queda drá
 
 **`--output_format` ou `-f`**: Permite que você escolha o **formato da transcrição ou legenda** gerada. As opções disponíveis são: `txt`, `vtt`, `srt`, `tsv`, `json` e `all` (que gera todos os formatos). O padrão é `all`.
 
+
+**Exemplo:**
+
+O arquivo de saída será `srt` (SubRip) na pasta indicada em `-o`. Essa pasta será criada caso não exista.
+
+```bash
+whisper /caminho/do/seu/arquivo.mp4 --model turbo -o caminho/da/pasta_de_saida -f srt
+```
+
 ---
 
 **`--task`**: Com este argumento, você pode escolher entre **transcrever o áudio** no idioma original ou **traduzir para o inglês**. As opções são `transcribe` (o padrão, que transcreve no idioma falado no áudio) ou `translate` (que traduz o conteúdo para o inglês).
+
+**Exemplo:**
+
+```bash
+whisper /caminho/do/seu/arquivo.mp4 --model turbo --task transcribe
+```
 
 ---
 
@@ -182,6 +209,19 @@ Forma longa (language name):
 
 Se precisar de um dicionário completo com todos os idiomas e seus códigos, ele está disponível em `whisper.tokenizer.LANGUAGES` dentro do código do `whisper`.
 
+
+**Exemplo:**
+
+```bash
+# Para o comando ficar menor, vou manter tudo padrão
+# model turbo (padrão)
+# task transcribe (padrão)
+# etc...
+# Idioma falado no vídeo "Português"
+whisper /caminho/do/seu/arquivo.mp4 --language pt
+```
+
+
 ---
 
 **`--temperature`:** controla a "criatividade" do modelo. Vai de `0.0` a `1.0`. Quanto mais alto, mais liberdade o modelo tem pra decidir os próximos tokens. Esse parâmetro interage com `--beam_size`, `--patience` e `--best_of`.
@@ -223,5 +263,23 @@ Na prática, o modelo vai responder como foi treinado, independente do seu capri
 - estiver errando demais em blocos grandes
 
 Se for só por causa de uma ou duas palavras... aceita e segue. Ou então faz igual eu: **testa tudo por uma semana e conclui que o padrão já era bom** 😅
+
+**Exemplo:**
+
+O arquivo de saída será `srt` (SubRip) na pasta indicada em `-o`. Essa pasta será criada caso não exista.
+
+```bash
+# Greedy: Mais rápido, mas pode errar mais por considerar apenas uma hipótese por vez.
+whisper /caminho/do/seu/arquivo.mp4 --temperature 0.0 --beam_size 1
+
+# Beam Search: Utiliza 3 hipóteses em paralelo.
+# O 'patience' padrão é 1.
+whisper /caminho/do/seu/arquivo.mp4 --temperature 0.0 --beam_size 3
+
+# Sampling: Gera 5 amostras diferentes para escolher a melhor.
+whisper /caminho/do/seu/arquivo.mp4 --temperature 0.7 --best_of 5
+```
+
+**`--temperature_increment_on_fallback`**: Este argumento permite que você **aumente a temperatura do modelo em casos de falha na transcrição**. Se o modelo encontrar dificuldades na temperatura `0.0`, ele fará um "fallback" e tentará com a temperatura incrementada. O valor também varia de `0.0` a `1.0`. No entanto, **cuidado: definir `0.0` para este argumento causará um erro `ZeroDivisionError: float division by zero`** (isso pode ser um pequeno "bugzinho" 🫣, mas, de fato, não faria muito sentido usar zero aqui, já que o objetivo é justamente *incrementar* a temperatura). O valor padrão é `0.2`.
 
 ---
