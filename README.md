@@ -211,6 +211,8 @@ Se precisar de um dicionário completo com todos os idiomas e seus códigos, ele
   🔴 --best_of (ignorado)
 ```
 
+**Importante:** Quanto maiores os valores de `--beam_size`, `--patience` e `--best_of`, mais lento e "indeciso" o modelo tende a ficar. Isso acontece porque ele precisa gerar mais hipóteses ou amostras e, em seguida, tomar uma decisão entre elas. Faça testes rápidos para confirmar esse comportamento.
+
 **Observação sincera:**
 
 Na prática, o modelo vai responder como foi treinado, independente do seu capricho nas configs. Trocar `temperature`, `beam_size`, `patience` e afins pode virar desperdício de tempo.
