@@ -1,10 +1,9 @@
 # sussu(rro): CLI educacional com OpenAI Whisper
 
 > Ferramenta de linha de comando focada em educação e IA offline.
-> Usa o poder do Whisper da OpenAI pra transcrever áudios e vídeos de forma simples.
+> Usa o poder do Whisper da OpenAI para transcrever áudios e vídeos de forma simples.
 
-Ao rodar este projeto, uma das primeiras coisas que você vai querer fazer é usar o
-comando `whisper` para fazer a transcrição inicial de algum vídeo ou áudio. Essa transcrição é um ótimo jeito de ver na prática como o Whisper trabalha e o que esperar dos resultados.
+Ao rodar este projeto, uma das primeiras coisas que você vai querer fazer é usar o comando `whisper` para fazer a transcrição inicial de algum vídeo ou áudio. Essa transcrição é um ótimo jeito de ver na prática como o **Whisper** trabalha e o que esperar dos resultados.
 
 - [Repositório oficial do `whisper`](https://github.com/openai/whisper)
 
@@ -12,13 +11,15 @@ Por isso, vamos começar pela **instalação** do projeto, o que vai disponibili
 
 ## Instalação do `sussu`
 
-Caso tenha dificuldades com o ambiente, recomendo meu tutorial:
+Se você encontrar alguma dificuldade com o ambiente, recomendo meu tutorial completo:
 
 - [Ambiente Python Moderno 2025: UV, Ruff, Pyright, pyproject.toml e VS Code](https://www.youtube.com/watch?v=HuAc85cLRx0)
 
-Este projeto usa o `Python 3.11.9` por questões de compatibilidade com o Whisper. Evite alterar essa versão caso não saiba o que está fazendo, porque eu **já testei tudo para você**.
+Este projeto utiliza o **Python 3.11.9** por questões de compatibilidade com o **Whisper**. Evite alterar essa versão se não souber o que está fazendo, pois **eu já testei tudo para você**.
 
-Além disso, este projeto também usa o [uv](https://docs.astral.sh/uv/) no gerenciamento geral (pacotes, versão do Python, etc).
+Além disso, este projeto usa o [`uv`](https://docs.astral.sh/uv/) para o gerenciamento geral (pacotes, versão do Python, etc.).
+
+Para instalar tudo, basta rodar o comando:
 
 ```sh
 uv sync  # é só isso mesmo 😅
@@ -35,111 +36,110 @@ uv sync  # é só isso mesmo 😅
 
 ## `ffmpeg`
 
-É necessário ter o [`ffmpeg`](https://ffmpeg.org/), que é um pacote de software open source que contém uma coleção de ferramentas e bibliotecas para lidar com arquivos multimídia, principalmente áudio e vídeo. O `whisper` trabalha com transcrição de arquivos de áudio, mas o `ffmpeg` permite que você não tenha que converter seus vídeos em áudio para fazer a transcrição.
+Você também precisará ter o **`ffmpeg`** instalado. Ele é um software de código aberto com várias ferramentas e bibliotecas para trabalhar com arquivos multimídia, especialmente áudio e vídeo. Embora o `whisper` foque na transcrição de áudio, o `ffmpeg` é quem permite que você transcreva seus vídeos diretamente, sem precisar convertê-los para áudio antes.
 
-Para instalar o ffmpeg no seu sistema use um dos comandos abaixo. Isso veio diretamente do [repositório oficial do `whisper`](https://github.com/openai/whisper):
+Para instalar o `ffmpeg` no seu sistema, você pode usar um dos comandos abaixo. Eles foram retirados diretamente do [repositório oficial do `whisper`](https://github.com/openai/whisper):
 
-```sh
-# no Ubuntu ou Debian
+```bash
+# No Ubuntu ou Debian
 sudo apt update && sudo apt install ffmpeg
 
-# no Arch Linux
+# No Arch Linux
 sudo pacman -S ffmpeg
 
-# no MacOS com Homebrew (https://brew.sh/)
+# No macOS com Homebrew (https://brew.sh/)
 brew install ffmpeg
 
-# no Windows com Chocolatey (https://chocolatey.org/)
+# No Windows com Chocolatey (https://chocolatey.org/)
 choco install ffmpeg
 
-# no Windows usando Scoop (https://scoop.sh/)
+# No Windows usando Scoop (https://scoop.sh/)
 scoop install ffmpeg
 
-# Adicional
-# no Windows usando winget (https://winstall.app/apps/Gyan.FFmpeg)
-winget install --id=Gyan.FFmpeg  -e
+# Adicional: No Windows usando winget (https://winstall.app/apps/Gyan.FFmpeg)
+winget install --id=Gyan.FFmpeg -e
 ```
 
-**Observação:** os únicos comandos que testei da lista acima foram do MacOS e Ubuntu. Aprovados ✅!
+**Observação:** Dos comandos listados, os únicos que testei e aprovei (✅) foram os para **macOS** e **Ubuntu**.
 
 ---
 
-## Rodando pela primeira vez
+## Rodando pela Primeira Vez
 
-Para testar se tudo funcionou perfeitamente você pode tanto **ativar o ambiente virtual** quanto usar **`uv run`**. Teste com `whisper -h`. Isso deve mostrar a `help` completa do `whisper`. Exemplos:
+Para verificar se tudo foi instalado corretamente, você tem duas opções: **ativar o ambiente virtual** ou usar o comando **`uv run`**. Sugiro que você teste com `whisper -h`. Esse comando deve exibir a ajuda completa do `whisper`, indicando que ele está funcionando. Veja os exemplos:
 
-```sh
+```bash
 uv run whisper -h
-# Ou se estiver com o ambiente virtual ativo
+# Ou, se você já ativou o ambiente virtual
 whisper -h
 ```
 
-**Observação:** alguns editores como VS Code ou Zed, ativam seu ambiente virtual automaticamente ao abrir uma nova instância do terminal se tudo estiver configurado corretamente, basta sair (`exit`) e abrir novamente o terminal.
+**Observação:** Editores de código como **VS Code** ou **Zed** podem ativar o ambiente virtual automaticamente ao abrir um novo terminal, desde que estejam configurados corretamente. Se for o seu caso, basta fechar e abrir o terminal novamente para que as mudanças façam efeito.
 
 ---
 
-## `whisper -h`: entendendo alguns argumentos importantes
+## `whisper -h`: Entendendo Alguns Argumentos Importantes
 
-Ao digitar `whisper -h` ou `whisper --help`, você pode se assustar com a quantidade de argumentos que estão ali, disponíveis para uso. Claro que você não precisa saber o que cada um deles faz, na verdade, a maioria dos argumentos tem valores padrão que já funcionam perfeitamente. Mas, caso queira personalizar um pouco o comportamente, vamos analisar alguns deles.
+Ao digitar `whisper -h` ou `whisper --help`, você pode se surpreender com a quantidade de argumentos disponíveis. Mas não se preocupe! Você não precisa saber o que cada um deles faz. Na verdade, a maioria dos argumentos já vem com valores padrão que funcionam perfeitamente. No entanto, se você quiser personalizar um pouco o comportamento da ferramenta, vamos analisar alguns dos mais importantes.
 
-O `whisper` usa o `argparse` do Python para criar essa `help` maravilhosa. Caso queira aprender mais sobre isso, assista meu vídeo:
+O `whisper` utiliza a biblioteca `argparse` do Python para gerar essa documentação de ajuda (`help`) completa e bem organizada. Se você tiver interesse em aprender mais sobre como criar interfaces de linha de comando profissionais com Python, confira meu vídeo:
 
 - [Python e argparse: Do Zero a uma CLI Profissional (Projeto Real na Prática)](https://www.youtube.com/watch?v=Ad6934NXn4A)
 
 ---
 
-### Argumentos essenciais do `whisper`
+### Argumentos Essenciais do `whisper`
 
-**`audio`:** este é um argumento posicional que representa o caminho do vídeo ou áudio que será transcrito.
+Vamos começar com os argumentos que você usará com mais frequência:
+
+**`audio`**: Este é o **argumento posicional** principal. Ele representa o caminho completo (localização) do arquivo de áudio ou vídeo que você quer transcrever.
 
 Exemplo:
 
-```sh
-whisper /caminho/do/arquivo.mp4
+```bash
+whisper /caminho/do/seu/arquivo.mp4
 ```
 
-Não especifiquei nada além de um caminho de vídeo no comando acima, abaixo detalho as opções que mais uso.
+No exemplo acima, você notou que especificamos apenas o caminho do arquivo de vídeo. Nas próximas seções, vou detalhar as opções que mais utilizo para personalizar a transcrição.
 
 ---
 
-**`--model MODEL`:** define qual o modelo será utilizado na transcrição do áudio. É opcional, e o valor padrão é `turbo`. Este model funciona muito bem, é rápido e multilíngue, mas requer cerca de **6GB de VRAM** para funcionar.
+**`--model MODEL`**: Este argumento serve para **definir qual modelo será usado na transcrição** do seu áudio ou vídeo. Ele é opcional, e o valor padrão é `turbo`. O modelo `turbo` é excelente: rápido e multilíngue, mas requer cerca de **6GB de VRAM** para rodar.
 
-Talvez você queira usar outros modelos que usam mais ou menos recursos do seu hardware, ou que possuem mais ou menos parâmetros (como `base`, `small`, `medium`, etc).
+Talvez você queira usar outros modelos que exigem mais ou menos recursos do seu hardware, ou que possuem mais ou menos parâmetros (como `base`, `small`, `medium`, etc.).
 
-Abaixo os modelos disponíveis:
+Aqui estão os modelos disponíveis e seus requisitos aproximados de VRAM:
 
-- **`tiny`:** 39M, `tiny.en` e `tiny`, VRAM ~1 GB
-- **`base`:** 74M, `base.en` e `base`, VRAM ~1 GB
-- **`small`:** 244M, `small.en` e `small`, VRAM ~2 GB
-- **`medium`:** 769M, `medium.en` e `medium`, VRAM ~5 GB
-- **`large`:** 1550M, `large`, `large-v2` e `large-v3`, VRAM ~10 GB
-- **`turbo`:** 809M, `turbo`, VRAM ~6 GB
+- **`tiny`**: 39M parâmetros, `tiny.en` e `tiny`, VRAM ~1 GB
+- **`base`**: 74M parâmetros, `base.en` e `base`, VRAM ~1 GB
+- **`small`**: 244M parâmetros, `small.en` e `small`, VRAM ~2 GB
+- **`medium`**: 769M parâmetros, `medium.en` e `medium`, VRAM ~5 GB
+- **`large`**: 1550M parâmetros, `large`, `large-v2` e `large-v3`, VRAM ~10 GB
+- **`turbo`**: 809M parâmetros, `turbo`, VRAM ~6 GB
 
-**VRAM** é um tipo especializado de memória RAM usada pelas placas de vídeo (GPUs).
-Se o seu computador compartilha a RAM com a GPU, como acontece nos Macs com chip Apple Silicon (M1, M2, M3 e posteriores), você conseguirá usar os modelos do Whisper **mesmo sem uma placa de vídeo dedicada**.
+**VRAM** é um tipo de memória RAM especializada que as placas de vídeo (GPUs) usam. Mas não se preocupe se você não tiver uma placa de vídeo dedicada! Se seu computador compartilha a RAM com a GPU, o que acontece em Macs com chips Apple Silicon (M1, M2, M3 e posteriores), por exemplo, você conseguirá usar os modelos do Whisper normalmente.
 
-Nesse caso, o fator limitador passa a ser a **quantidade total de memória disponível no sistema**.
-Por exemplo: se você tem apenas 8GB de RAM, o ideal é testar os modelos `tiny`, `base` ou `small`.
+Nesses casos, o que realmente limita é a **quantidade total de memória RAM disponível no seu sistema**. Por exemplo: se você tem apenas 8GB de RAM, o ideal é testar os modelos `tiny`, `base` ou `small`.
 
-A partir do modelo `medium`, é bem provável que você perceba uma **queda absurda no desempenho geral da máquina**, já que a memória será completamente consumida.
+A partir do modelo `medium`, é bem provável que você perceba uma **queda drástica no desempenho geral da sua máquina**, já que a memória será completamente consumida.
 
 ---
 
-**`--device DEVICE`:** se você tem uma placa de vídeo NVIDIA com driver CUDA e versão compatível com o PyTorch, vale a pena usar `--device cuda`, do contrário nem se preocupe em mexer com essa opção. Padrão é `cpu`.
+**`--device DEVICE`**: Este argumento é para você que possui uma **placa de vídeo NVIDIA com drivers CUDA** e uma versão compatível com o PyTorch. Se for o seu caso, vale a pena usar `--device cuda` para aproveitar o processamento da GPU. Caso contrário, não se preocupe em alterar esta opção, o padrão é `cpu` (processamento pela CPU) e funcionará perfeitamente.
 
 ---
 
-**`--output_dir` ou `-o`:** o caminho da pasta onde as transcrições serão salvas. Padrão é na raiz do projeto (`.`).
+**`--output_dir` ou `-o`**: Define o **caminho da pasta onde as transcrições serão salvas**. Por padrão, os arquivos serão salvos na raiz do projeto (`.`).
 
-**`--output_format` ou `-f`:** o formato da transcrição (ou legenda) que deseja. Opções: `txt`, `vtt`, `srt`, `tsv`, `json` e `all` (todos). O padrão é `all` (todos).
-
----
-
-**`--task`:** você pode transcrever ou traduzir um áudio para inglês. O padrão é transcrever no idioma que está sendo falado no áudio. Opções `transcribe` (transcrever) ou `translate` (traduzir para inglês).
+**`--output_format` ou `-f`**: Permite que você escolha o **formato da transcrição ou legenda** gerada. As opções disponíveis são: `txt`, `vtt`, `srt`, `tsv`, `json` e `all` (que gera todos os formatos). O padrão é `all`.
 
 ---
 
-**`--language`:** o idioma falado no áudio. São muitas opções (veja abaixo). O `whisper` é capaz de detectar o idioma falado no vídeo se essa opção não for enviada.
+**`--task`**: Com este argumento, você pode escolher entre **transcrever o áudio** no idioma original ou **traduzir para o inglês**. As opções são `transcribe` (o padrão, que transcreve no idioma falado no áudio) ou `translate` (que traduz o conteúdo para o inglês).
+
+---
+
+**`--language`**: Este argumento permite que você **especifique o idioma falado no áudio ou vídeo**. Existem muitas opções de idiomas disponíveis. Se você não informar esse argumento, o `whisper` é inteligente o suficiente para detectar automaticamente o idioma do conteúdo.
 
 Forma curta (language code):
 
@@ -153,6 +153,8 @@ Forma curta (language code):
 "so", "sq", "sr", "su", "sv", "sw", "ta", "te", "tg", "th", "tk", "tl", "tr",
 "tt", "uk", "ur", "uz", "vi", "yi", "yo", "yue", "", "zh"]
 ```
+
+- Exemplo para português do Brasil: `--language pt`
 
 Forma longa (language name):
 
@@ -176,8 +178,9 @@ Forma longa (language name):
 "Valencian", "Vietnamese", "Welsh", "Yiddish", "Yoruba"]
 ```
 
-Já coloquei tudo com aspas e em uma lista para facilitar a sua vida. Mesmo assim, se quiser um
-dicionário pronto, está em `whisper.tokenizer.LANGUAGES`.
+- Exemplo para português do Brasil: `--language Portuguese`
+
+Se precisar de um dicionário completo com todos os idiomas e seus códigos, ele está disponível em `whisper.tokenizer.LANGUAGES` dentro do código do `whisper`.
 
 ---
 
@@ -193,19 +196,19 @@ dicionário pronto, está em `whisper.tokenizer.LANGUAGES`.
 
 ```
 - temperature > 0 → usa sampling
-  ✅ best_of 5 (5 amostras)
-  🔴 beam_size (ignorado)
-  🔴 patience (ignorado)
+  ✅ --best_of 5 (5 amostras)
+  🔴 --beam_size (ignorado)
+  🔴 --patience (ignorado)
 
 - temperature == 0 → usa beam search
   ✅ --beam_size 5 (5 hipóteses)
   ✅ --patience 2 (2 x 5 = 10 hipóteses)
-  🔴 best_of (ignorado)
+  🔴 --best_of (ignorado)
 
 - temperature == 0 → greedy
   ✅ --beam_size 1 (1 hipótese)
   🔴 --patience (não faz diferença)
-  🔴 best_of (ignorado)
+  🔴 --best_of (ignorado)
 ```
 
 **Observação sincera:**
@@ -214,8 +217,8 @@ Na prática, o modelo vai responder como foi treinado, independente do seu capri
 
 **Recomendação direta:** só mexa nessas opções se:
 
-* o modelo começar a repetir palavras (loop)
-* estiver errando demais em blocos grandes
+- o modelo começar a repetir palavras (loop)
+- estiver errando demais em blocos grandes
 
 Se for só por causa de uma ou duas palavras... aceita e segue. Ou então faz igual eu: **testa tudo por uma semana e conclui que o padrão já era bom** 😅
 
