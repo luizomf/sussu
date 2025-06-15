@@ -340,16 +340,22 @@ O `--initial_prompt` pode afetar significativamente a forma como o modelo do `wh
 Para cortar facilmente um pedaço do seu vídeo para testes, você pode usar o `ffmpeg` com o seguinte comando:
 
 ```bash
+# Com ffmpeg
 ffmpeg -i entrada.mp4 -c:v copy -c:a copy -ss 00:05:00.000 -to 00:10:00.000 saida.mp4
+
+# Também dá pra usar --clip_timestamps start, end, start, end... (em segundos)
+# O argumento --clip_timestamps é detalhado mais abaixo nesse texto
+# No comando abaixo ele transcreve de 1min até 2min (nada mais)
+whisper meu_video.mp4 --clip_timestamps 60,120
 ```
 
 **Entendendo o Comando `ffmpeg`:**
 
-* `-i entrada.mp4`: Define o arquivo de vídeo de entrada (o seu vídeo original).
-* `-c:v copy`: Copia o codec de vídeo do arquivo original, sem recodificar. Isso torna o processo muito mais rápido!
-* `-c:a copy`: Copia o codec de áudio do arquivo original, também sem recodificar.
-* `-ss 00:05:00.000`: Especifica o ponto de início do corte (neste exemplo, 5 minutos e 0 segundos do vídeo original).
-* `-to 00:10:00.000`: Define o ponto final do corte (neste exemplo, 10 minutos e 0 segundos do vídeo original).
+- `-i entrada.mp4`: Define o arquivo de vídeo de entrada (o seu vídeo original).
+- `-c:v copy`: Copia o codec de vídeo do arquivo original, sem recodificar. Isso torna o processo muito mais rápido!
+- `-c:a copy`: Copia o codec de áudio do arquivo original, também sem recodificar.
+- `-ss 00:05:00.000`: Especifica o ponto de início do corte (neste exemplo, 5 minutos e 0 segundos do vídeo original).
+- `-to 00:10:00.000`: Define o ponto final do corte (neste exemplo, 10 minutos e 0 segundos do vídeo original).
 
 Este comando irá gerar um novo arquivo de vídeo (`saida.mp4`) contendo apenas o segmento entre 00:05:00 e 00:10:00 do vídeo original. Essa técnica é extremamente útil, especialmente para vídeos mais longos (como os meus de 30+ minutos), pois permite testar configurações específicas em um pedaço pequeno sem ter que processar o vídeo inteiro.
 
@@ -374,5 +380,115 @@ Para otimizar suas transcrições, considere as seguintes dicas:
 - Para vídeos **bem gravados**, com **áudio limpo** e **sem erros ou repetições evidentes**, mantenha o padrão: `--condition_on_previous_text=True`.
 - Se o modelo começar a **repetir frases ou palavras** de forma indesejada, experimente mudar para `--condition_on_previous_text=False`.
 - O `--initial_prompt` pode ajudar **somente no início** da transcrição. Não espere que ele resolva problemas de consistência para o vídeo inteiro, mas pode ser útil para guiar o modelo em termos específicos.
+
+---
+
+### Parâmetros que não usei 🫣 (mas parecem interessantes):
+
+Esses parâmetros aí de baixo **eu não testei quase nada**. Só li a documentação, pesquei uma ideia geral e traduzi pra você não precisar sofrer. Se quiser fuçar, fuce, mas vai por sua conta e risco. Pode ser que melhore algo, pode ser que não mude nada. Vai depender do áudio, da fase da lua e do humor do modelo 😅.
+
+Se eu começar a usar alguma dessas opções nas minhas transcrições, prometo que volto aqui e atualizo esse trecho.
+
+**`--length_penalty`**
+
+Controla a penalização para _sequências longas_. Valor típico: entre `0.6` e `1.0`. Se você notar que a transcrição tá muito curta ou longa, pode brincar com isso.
+
+**`--suppress_tokens`**
+
+Permite suprimir tokens pelo ID. O valor `-1` (padrão) já suprime símbolos esquisitos e só mantém pontuações comuns. Deixa assim, a menos que você saiba o que está fazendo.
+
+_Quer saber o ID de um token específico?_
+
+Dá pra descobrir com um script usando o `tokenizer.encode("seu texto aqui")`, mas sinceramente... se chegou nesse ponto, você já tá no nível "mexendo no motor com o carro ligado" 😂 (talvez nem estaria lendo esse texto).
+
+**`--fp16`**
+
+Usa precisão _float16_ pra acelerar em GPU. No CPU, pode causar erro ou queda de performance. Se estiver no Mac M1/M2, provavelmente tem que desativar (`--fp16 False`).
+
+**`--compression_ratio_threshold`**
+
+Se a razão de compressão (gzip) do texto for muito alta, ele assume que houve erro (textos muito repetitivos). Valor padrão é `2.4`. Útil pra detectar _loop de repetição_.
+
+**`--logprob_threshold`**
+
+Se a média de log-probs dos tokens estiver abaixo disso, ele trata como erro. Padrão: `-1.0`. Deixa isso quieto a menos que esteja debugando problemas muito específicos.
+
+**`--no_speech_threshold`**
+
+Se ele acha que é silêncio (prob. alta de `<|nospeech|>`), e a decodificação falhou (`logprob_threshold`), considera o trecho como silêncio. Ajuda a cortar "respiro vazio".
+
+---
+
+**`--prepend_punctuations`** (com `--word_timestamps True`):
+
+Este argumento controla quais caracteres de pontuação que aparecem **antes** de uma palavra devem ser "colados" à palavra seguinte, em vez de serem tratados como um token separado.
+
+- **Padrão**: `\"\'“¿([{-` (inclui aspas, parênteses, etc.) e requer `--word_timestamps True`.
+
+Em teoria, se o modelo gerasse, por exemplo, os tokens `(`, `arg`, `ument`, `os`, `)` separadamente (tipo: `[7, 33544, 2206, 329, 8]` que formariam `(argumentos)`), o `(` e o `arg` seriam unidos para formar `(arg`.
+
+> **Observação Importante**: eu testei o `whisper` com os idiomas `Portuguese` e `English` (90% em `Portuguese`, que é meu caso de uso). Em nenhuma das legendas que gerei houve qualquer caso onde a pontuação viesse antes de alguma palavra. Na prática, eu realmente não usei este parâmetro.
+
+---
+
+**`--append_punctuations`** (com `--word_timestamps True`):
+
+Este argumento controla quais caracteres de pontuação que aparecem **depois** de uma palavra devem ser "colados" à palavra anterior.
+
+- **Padrão**: `\"\'.。,，!！?？:：”)]}、` (inclui aspas, pontos, vírgulas, interrogações, etc.) e requer `--word_timestamps True`.
+
+Por exemplo, se os tokens gerados forem `Ok` e `?` separadamente, e o `?` estiver incluído nesta lista (o que já está por padrão), eles serão unidos para formar `Ok?`.
+
+**Dica Prática**: Esses argumentos de pontuação só farão uma diferença perceptível se você precisar que o ponto ou outro símbolo tenha um `timestamp` _exatamente_ separado da palavra, o que é um caso de uso bastante específico. Na maioria das situações, o padrão do `whisper` já é bastante robusto. Do contrário, e para simplificar, mantenha os valores padrão.
+
+---
+
+### Outros úteis
+
+**`--threads`**
+
+Define o número de _threads_ que o modelo vai usar na CPU. Exemplo: `--threads 4`.
+Se não passar nada, ele usa o padrão da Torch (geralmente via MKL ou OMP).
+
+Nos meus testes (Mac M1), usei `1, 4, 10, 100, 1000`. O resultado?
+Ele só criou mais _threads_ e usou mais CPU, **mas a velocidade de transcrição não mudou absolutamente nada**.
+
+Claro, meus testes foram superficiais. Pode ser que em outro sistema, com outra CPU (ou invocando Cthulhu no terminal), você veja alguma diferença.
+Eu? Só vi o cooler suando.
+
+---
+
+**`--clip_timestamps`**
+
+Permite transcrever ou traduzir apenas trechos específicos do áudio ou vídeo.
+Você passa os intervalos como pares `start,end` (em segundos). Pode usar vários.
+
+**Exemplos:**
+
+- `--clip_timestamps 10,30` → transcreve de 10s até 30s
+- `--clip_timestamps 60,120` → de 1min até 2min
+- `--clip_timestamps 10,30,60,120` → dois trechos: 10s–30s e 1min–2min
+- ⚠️ `--clip_timestamps 270` → de 4min30s até o final
+- ⚠️ `--clip_timestamps 60,120,0` → transcreve de 1min–2min **e depois recomeça do zero até o fim**
+
+**Atenção:**
+
+Esse último exemplo (`60,120,0`) parece um caso não previsto.
+
+O `0` vem depois de `120`, mas não forma um par `start,end`.
+
+Nos testes, isso gerou um comportamento curioso: o modelo transcreveu normalmente de 1min até 2min, **e depois do início até o final**.
+
+Mesmo assim, o VLC interpretou direitinho. Ele realinhou os blocos e ignorou os duplicados, mostrando só o que fazia sentido cronológico (**aparentemente cortando o primeiro minuto**).
+
+---
+
+**`--hallucination_silence_threshold`**
+
+Funciona junto com `--word_timestamps True`.
+
+Ele tenta detectar trechos de silêncio longos que o modelo pode ter “alucinado” (inventado texto).
+
+Se você passar `--hallucination_silence_threshold 1.5`, ele vai **ignorar silêncios maiores que 1.5s que geraram texto suspeito**.
 
 ---
