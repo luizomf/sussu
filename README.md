@@ -310,3 +310,47 @@ whisper meu_video.mp4 \
 ```
 
 ---
+
+**`--initial_prompt`**:
+
+Este é um texto opcional que serve como um **"empurrãozinho" para o modelo antes que ele comece a transcrever**. Funciona como uma dica de estilo ou contexto. No entanto, é importante notar que ele só influencia a **primeira "janela" do áudio** (que por padrão tem 30 segundos).
+
+**Exemplo Prático:**
+
+Se o seu vídeo é sobre programação, especificamente Python, você pode passar um prompt como este:
+
+```bash
+--initial_prompt "vídeo de uma explicação sobre programação com destaque para bibliotecas do Python"
+```
+
+Isso pode ajudar o modelo a reconhecer e transcrever termos técnicos de programação e Python com mais precisão. Mas, como dito, não espere milagres para o vídeo inteiro; essa influência é apenas um toque inicial. Para as janelas seguintes, o modelo pode usar o texto transcrito anteriormente, se a opção `--condition_on_previous_text` estiver como `True` (que é o padrão).
+
+**Analogia para Entender Melhor:**
+
+> Imagine que é como dizer para um cantor, antes de ele subir no palco:
+> "Tem 300 mil pessoas te esperando, detona lá!"
+> Ele vai subir já no clima certo, mas o resto da performance dependerá do show em si. Da mesma forma, o modelo continua a transcrição com base no que "ouviu" e transcreveu depois do prompt inicial.
+
+---
+
+**`--condition_on_previous_text`**:
+
+Este argumento crucial define se **o texto que já foi transcrito será usado como contexto** para ajudar a transcrever a próxima "janela" do áudio.
+
+- `True` (padrão): É a configuração ideal para a maioria dos casos. Ela ajuda a manter a **fluidez e a consistência** do texto, garantindo uma boa coesão entre os blocos da transcrição.
+- `False`: Desativa o uso do contexto anterior. Isso pode ser útil para **evitar "loops de erro"**, onde o modelo fica repetindo frases ou palavras indefinidamente.
+
+> _Exemplo de Uso:_
+> Se a transcrição começar a errar e ficar repetindo, por exemplo, `"Olá, pessoal, hoje vamos falar sobre..."` em loop, desativar este argumento (`--condition_on_previous_text=False`) pode quebrar esse ciclo vicioso.
+
+---
+
+**Recomendações Gerais para Contexto**
+
+Para otimizar suas transcrições, considere as seguintes dicas:
+
+- Para vídeos **bem gravados**, com **áudio limpo** e **sem erros ou repetições evidentes**, mantenha o padrão: `--condition_on_previous_text=True`.
+- Se o modelo começar a **repetir frases ou palavras** de forma indesejada, experimente mudar para `--condition_on_previous_text=False`.
+- O `--initial_prompt` pode ajudar **somente no início** da transcrição. Não espere que ele resolva problemas de consistência para o vídeo inteiro, mas pode ser útil para guiar o modelo em termos específicos.
+
+---
