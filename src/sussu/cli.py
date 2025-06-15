@@ -1,2 +1,2 @@
 def run() -> None:
-    print("Hello world...")
+    print("Hello world!!!")
