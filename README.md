@@ -385,9 +385,10 @@ Isso pode ajudar o modelo a reconhecer e transcrever termos técnicos de program
 
 **Analogia para Entender Melhor:**
 
-> Imagine que é como dizer para um cantor, antes de ele subir no palco:
-> "Tem 300 mil pessoas te esperando, detona lá!"
-> Ele vai subir já no clima certo, mas o resto da performance dependerá do show em si. Da mesma forma, o modelo continua a transcrição com base no que "ouviu" e transcreveu depois do prompt inicial.
+> Imagine que é como dizer para um cantor, antes de ele subir no palco: \
+> "Tem 300 mil pessoas te esperando, detona lá!" \
+> Ele vai subir já no clima certo, mas o resto da performance dependerá do show em si. \
+> Da mesma forma, o modelo continua a transcrição com base no que "ouviu" e transcreveu depois do prompt inicial.
 
 **Cuidados com o `--initial_prompt`**:
 
