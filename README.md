@@ -3,16 +3,35 @@
 > Ferramenta de linha de comando focada em educação e IA offline.
 > Usa o poder do Whisper da OpenAI para transcrever áudios e vídeos de forma simples.
 
-Estou tentando manter este README sincronizado com o link abaixo. Caso não encontre o que procura aqui, acesse:
+---
+
+## Sobre o Whisper e a OpenAI
+
+Estava curioso para saber se a OpenAI usa o Whisper em seus próprios produtos, então questionei o ChatGPT...
+
+> **Eu:** A OpenAI usa o Whisper internamente em algum recurso que as pessoas consomem?
+> **ChatGPT:** Sim, a OpenAI usa o Whisper como base para recursos de transcrição e compreensão de áudio em produtos como o ChatGPT com entrada de voz. Ele também é utilizado em APIs que envolvem reconhecimento de fala, como a `speech-to-text` da OpenAI.
+
+---
+
+## Sobre este documento:
+
+Estou tentando manter este documento (`README.md`) sincronizado com o link abaixo. Caso não encontre o que procura aqui, acesse:
 
 - [Transcreva áudio com Python: Sussu CLI + OpenAI Whisper](https://www.otaviomiranda.com.br/2025/python-sussu-cli-openai-whisper/)
+
+---
+
+## Introdução geral
 
 Ao rodar este projeto, uma das primeiras coisas que você vai querer fazer é usar o comando `whisper` para fazer a transcrição inicial de algum vídeo ou áudio. Essa transcrição é um ótimo jeito de ver na prática como o **Whisper** trabalha e o que esperar dos resultados.
 
 - [Repositório oficial do `whisper`](https://github.com/openai/whisper)
 - [Repositório do `sussu`](https://github.com/luizomf/sussu)
 
-Por isso, vamos começar pela **instalação** do projeto, o que vai disponibilizar os comandos `sussu` e `whisper` no terminal.
+Vamos começar pela **instalação** do projeto, isso já coloca os comandos `sussu` e `whisper` funcionando direto no seu terminal.
+
+---
 
 ## Instalação do `sussu`
 
@@ -154,7 +173,11 @@ whisper /caminho/do/seu/arquivo.mp4 --model large-v2 --device cpu
 
 **`--output_dir` ou `-o`**: Define o **caminho da pasta onde as transcrições serão salvas**. Por padrão, os arquivos serão salvos na raiz do projeto (`.`).
 
+---
+
 **`--output_format` ou `-f`**: Permite que você escolha o **formato da transcrição ou legenda** gerada. As opções disponíveis são: `txt`, `vtt`, `srt`, `tsv`, `json` e `all` (que gera todos os formatos). O padrão é `all`.
+
+---
 
 **Exemplo:**
 
@@ -178,6 +201,8 @@ whisper /caminho/do/seu/arquivo.mp4 --model turbo --task transcribe
 
 **`--language`**: Este argumento permite que você **especifique o idioma falado no áudio ou vídeo**. Existem muitas opções de idiomas disponíveis. Se você não informar esse argumento, o `whisper` é inteligente o suficiente para detectar automaticamente o idioma do conteúdo.
 
+---
+
 Forma curta (language code):
 
 ```python
@@ -192,6 +217,8 @@ Forma curta (language code):
 ```
 
 - Exemplo para português do Brasil: `--language pt`
+
+---
 
 Forma longa (language name):
 
@@ -234,11 +261,19 @@ whisper /caminho/do/seu/arquivo.mp4 --language pt
 
 **`--temperature`:** controla a "criatividade" do modelo. Vai de `0.0` a `1.0`. Quanto mais alto, mais liberdade o modelo tem pra decidir os próximos tokens. Esse parâmetro interage com `--beam_size`, `--patience` e `--best_of`.
 
+---
+
 **`--beam_size`:** número de hipóteses que o modelo mantém em paralelo. Pensa como se ele testasse vários caminhos ao mesmo tempo e no fim escolhesse o melhor. O padrão é `5` e **só funciona se `--temperature == 0.0`**.
+
+---
 
 **`--patience`:** fator de tolerância que faz o modelo continuar explorando novas hipóteses mesmo depois de achar uma aceitável. Requer `--temperature == 0.0` e `--beam_size > 1`.
 
+---
+
 **`--best_of`:** número de amostras diferentes geradas antes de escolher a melhor. Funciona apenas quando `--temperature > 0.0`.
+
+---
 
 **Cola rápida:**
 
@@ -288,19 +323,31 @@ whisper /caminho/do/seu/arquivo.mp4 --temperature 0.0 --beam_size 3
 whisper /caminho/do/seu/arquivo.mp4 --temperature 0.7 --best_of 5
 ```
 
+---
+
 **`--temperature_increment_on_fallback`**: Este argumento permite que você **aumente a temperatura do modelo em casos de falha na transcrição**. Se o modelo encontrar dificuldades na temperatura `0.0`, ele fará um "fallback" e tentará com a temperatura incrementada. O valor também varia de `0.0` a `1.0`. No entanto, **cuidado: definir `0.0` para este argumento causará um erro `ZeroDivisionError: float division by zero`** (isso pode ser um pequeno "bugzinho" 🫣, mas, de fato, não faria muito sentido usar zero aqui, já que o objetivo é justamente _incrementar_ a temperatura). O valor padrão é `0.2`.
 
 ---
 
 **`--max_line_width`**: Define a **quantidade máxima de caracteres por linha** na sua legenda. O valor padrão é `1000` (um limite bastante alto, codificado diretamente na classe `SubtitlesWriter` do `whisper`). Eu, particularmente, costumo usar `45` para uma melhor legibilidade. **Importante:** Se este argumento for utilizado, ele anula o `--max_words_per_line`. **Requer `--word_timestamps True`**.
 
+---
+
 **`--max_line_count`**: Controla a **quantidade máxima de linhas por legenda** (ou "bloco" de texto). Eu uso o valor `2`, mas, nos meus testes, percebi que isso força todas as legendas a terem sempre duas linhas. Para mim, não é um problema, mas vale a pena você testar para ver como se adapta ao seu caso. **Requer `--word_timestamps True`**.
+
+---
 
 **`--max_words_per_line`**: Determina a **quantidade máxima de palavras por linha** na legenda. O padrão também é um valor alto, `1000` (também "hardcoded" na classe `SubtitlesWriter`). Embora eu não costume usá-lo, acredito que `5` palavras por linha pode resultar em uma leitura mais confortável. **Atenção:** Será anulado por `--max_line_width` caso você use ambos no mesmo comando. **Requer `--word_timestamps True`**.
 
+---
+
 **`--highlight_words`**: Este é o argumento responsável por criar o **efeito de "karaokê"** na sua transcrição. Ele faz com que cada palavra falada seja sublinhada no momento exato em que é pronunciada. **Requer `--word_timestamps True`**.
 
+---
+
 **`--word_timestamps`**: Este argumento é a **chave** para ativar os recursos de sincronização detalhada. Ao defini-lo como `True`, o modelo passará a gerar **timestamps para cada palavra**, em vez de apenas por blocos de frase. Isso pode, sim, aumentar consideravelmente o tempo de transcrição, mas é um requisito fundamental para que vários outros argumentos (como os de formatação de linha e destaque de palavras) funcionem. O valor padrão é `False`.
+
+---
 
 **Exemplo Completo de Transcrição Detalhada**
 
@@ -400,9 +447,13 @@ Esses parâmetros aí de baixo **eu não testei quase nada**. Só li a documenta
 
 Se eu começar a usar alguma dessas opções nas minhas transcrições, prometo que volto aqui e atualizo esse trecho.
 
+---
+
 **`--length_penalty`**
 
 Controla a penalização para _sequências longas_. Valor típico: entre `0.6` e `1.0`. Se você notar que a transcrição tá muito curta ou longa, pode brincar com isso.
+
+---
 
 **`--suppress_tokens`**
 
@@ -412,17 +463,25 @@ _Quer saber o ID de um token específico?_
 
 Dá pra descobrir com um script usando o `tokenizer.encode("seu texto aqui")`, mas sinceramente... se chegou nesse ponto, você já tá no nível "mexendo no motor com o carro ligado" 😂 (talvez nem estaria lendo esse texto).
 
+---
+
 **`--fp16`**
 
 Usa precisão _float16_ pra acelerar em GPU. No CPU, pode causar erro ou queda de performance. Se estiver no Mac M1/M2, provavelmente tem que desativar (`--fp16 False`).
+
+---
 
 **`--compression_ratio_threshold`**
 
 Se a razão de compressão (gzip) do texto for muito alta, ele assume que houve erro (textos muito repetitivos). Valor padrão é `2.4`. Útil pra detectar _loop de repetição_.
 
+---
+
 **`--logprob_threshold`**
 
 Se a média de log-probs dos tokens estiver abaixo disso, ele trata como erro. Padrão: `-1.0`. Deixa isso quieto a menos que esteja debugando problemas muito específicos.
+
+---
 
 **`--no_speech_threshold`**
 
