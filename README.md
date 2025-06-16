@@ -494,7 +494,18 @@ Seguinte, se você que descobrir algum token para suprimir ou para qualquer outr
 
 **`--fp16`**
 
-Usa precisão _float16_ pra acelerar em GPU. No CPU, pode causar erro ou queda de performance. Se estiver no Mac M1/M2, provavelmente tem que desativar (`--fp16 False`).
+Usa precisão *float16* para acelerar em GPU.
+
+No Mac M1, por exemplo, eu sempre uso `--fp16 False`, assim ele não fica mostrando warning de que trocou pra *float32*. Essa troca acontece automaticamente se o seu hardware **não** suportar *float16*, então:
+
+* **Se suportar:** passa direto com *float16*.
+* **Se não suportar:** ele mostra um aviso e troca para *float32* sozinho.
+
+Exemplo do warning:
+
+```
+FP16 is not supported on CPU; using FP32 instead
+```
 
 ---
 
@@ -502,17 +513,76 @@ Usa precisão _float16_ pra acelerar em GPU. No CPU, pode causar erro ou queda d
 
 Se a razão de compressão (gzip) do texto for muito alta, ele assume que houve erro (textos muito repetitivos). Valor padrão é `2.4`. Útil pra detectar _loop de repetição_.
 
+**Como funciona a ideia:**
+
+O Whisper pega o texto, compacta com gzip e compara o **tamanho original** com o **tamanho compactado** para calcular a **razão de compressão**. Textos repetitivos geram compressões mais eficientes, ou seja, **razão mais alta**.
+
+- `"Olá, olá, olá, olá, olá..."` → compacta muito → **alta razão**
+- `"O rato roeu a roupa do rei de Roma."` → mais diversidade → **menor razão**
+
+Se a razão ultrapassar o limite definido (padrão: `2.4`), o Whisper **descarta o trecho** por considerá-lo problemático (repetitivo, bugado etc).
+
+Se sua transcrição estiver falhando **sem motivo claro**, esse filtro pode ser o culpado.
+Teste com `--compression_ratio_threshold 0` e veja se melhora.
+
 ---
 
 **`--logprob_threshold`**
 
-Se a média de log-probs dos tokens estiver abaixo disso, ele trata como erro. Padrão: `-1.0`. Deixa isso quieto a menos que esteja debugando problemas muito específicos.
+Se a média do logaritmo da probabilidade (logprob) dos tokens estiver abaixo disso, ele trata como erro. Padrão: `-1.0`. Você consegue ver `avg_logprob` (média do logaritmo da probabilidade) das frases transcritas pelo Whisper no arquivo `.json` final gerado. Este arquivo contém algo similar a isso:
+
+```json
+{
+  "id": 102,
+  "seek": 27632,
+  "start": 293.8,
+  "end": 294.66,
+  "text": " primeiro os imports",
+  "tokens": [51240, 18314, 3003, 41596, 51283],
+  "temperature": 0.0,
+  "avg_logprob": -0.08265516709308235,
+  "compression_ratio": 1.7523364485981308,
+  "no_speech_prob": 1.1688144375965326e-11,
+  "words": [
+    {
+      "word": " primeiro",
+      "start": 293.8,
+      "end": 294.06,
+      "probability": 0.7435079216957092
+    },
+    {
+      "word": " os",
+      "start": 294.06,
+      "end": 294.24,
+      "probability": 0.9965941309928894
+    },
+    {
+      "word": " imports",
+      "start": 294.24,
+      "end": 294.66,
+      "probability": 0.990346372127533
+    }
+  ]
+}
+```
+
+Aqui `avg_logprob` é `-0.08265516709308235`. Quanto mais próximo de `0`, mais confiante está o modelo.
+
+Suponha que o modelo está descartando coisas na transcrição. Você poderia testar `--logprob_threshold=-2.0` ou até `--logprob_threshold=-1000` (não descarta nada).
+
+Isso pode gerar muito ruído aleatório na transcrição, mas pode fazer ele detectar o que você quer.
+
+O contrário também é verdadeiro. Se usar `--logprob_threshold=-0.1` (por exemplo), o modelo vai pegar praticamente só o que tem certeza absoluta que tá certo. Isso não é uma coisa boa ou ruim, depende do contexto e do seu objetivo. Na dúvida, manter o padrão costuma ser uma escolha segura.
+
+Quanto mais rigoroso, mais lento, porque ele vai tentar gerar várias hipóteses até alcançar esse nível de confiança. No fim das contas, ele vai te entregar um texto de qualquer jeito, mas pode demorar bem mais e talvez nem seja tão diferente assim.
 
 ---
 
 **`--no_speech_threshold`**
 
-Se ele acha que é silêncio (prob. alta de `<|nospeech|>`), e a decodificação falhou (`logprob_threshold`), considera o trecho como silêncio. Ajuda a cortar "respiro vazio".
+Se o modelo acredita que é silêncio (probabilidade alta de `<|nospeech|>`) **e** a decodificação falha (`logprob_threshold`), ele descarta o trecho como sendo silêncio. Isso ajuda a cortar "respiros vazios" da transcrição.
+
+Essa funcionalidade me encanta, e tenho planos futuros pra ela. Quem sabe a gente não volta a falar disso mais pra frente?
 
 ---
 
@@ -584,8 +654,8 @@ Mesmo assim, o VLC interpretou direitinho. Ele realinhou os blocos e ignorou os 
 
 Funciona junto com `--word_timestamps True`.
 
-Ele tenta detectar trechos de silêncio longos que o modelo pode ter “alucinado” (inventado texto).
+Ele tenta detectar trechos de silêncio longos que o modelo pode ter "alucinado" (inventado texto).
 
-Se você passar `--hallucination_silence_threshold 1.5`, ele vai **ignorar silêncios maiores que 1.5s que geraram texto suspeito**.
+Se você passar `--hallucination_silence_threshold 1.5`, ele vai **ignorar silêncios maiores que 1.5s que geraram texto suspeito**. Não toquei nesse argumento.
 
 ---
