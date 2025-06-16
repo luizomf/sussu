@@ -9,7 +9,7 @@
 
 Estava curioso para saber se a OpenAI usa o Whisper em seus próprios produtos, então questionei o ChatGPT...
 
-> **Eu:** A OpenAI usa o Whisper internamente em algum recurso que as pessoas consomem?
+> **Eu:** A OpenAI usa o Whisper internamente em algum recurso que as pessoas consomem? \
 > **ChatGPT:** Sim, a OpenAI usa o Whisper como base para recursos de transcrição e compreensão de áudio em produtos como o ChatGPT com entrada de voz. Ele também é utilizado em APIs que envolvem reconhecimento de fala, como a `speech-to-text` da OpenAI.
 
 ---
