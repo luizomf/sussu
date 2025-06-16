@@ -1,6 +1,6 @@
 # sussu(rro): CLI educacional com OpenAI Whisper
 
-> Ferramenta de linha de comando focada em educação e IA offline.
+> Ferramenta de linha de comando focada em educação e IA offline. \
 > Usa o poder do Whisper da OpenAI para transcrever áudios e vídeos de forma simples.
 
 ---
@@ -427,7 +427,7 @@ Este argumento crucial define se **o texto que já foi transcrito será usado co
 - `True` (padrão): É a configuração ideal para a maioria dos casos. Ela ajuda a manter a **fluidez e a consistência** do texto, garantindo uma boa coesão entre os blocos da transcrição.
 - `False`: Desativa o uso do contexto anterior. Isso pode ser útil para **evitar "loops de erro"**, onde o modelo fica repetindo frases ou palavras indefinidamente.
 
-> _Exemplo de Uso:_
+> _Exemplo de Uso:_ \
 > Se a transcrição começar a errar e ficar repetindo, por exemplo, `"Olá, pessoal, hoje vamos falar sobre..."` em loop, desativar este argumento (`--condition_on_previous_text=False`) pode quebrar esse ciclo vicioso.
 
 ---
@@ -442,17 +442,17 @@ Para otimizar suas transcrições, considere as seguintes dicas:
 
 ---
 
-### Parâmetros que não usei 🫣 (mas parecem interessantes):
+### Parâmetros que não usei (ou quase não usei 🫣):
 
-Esses parâmetros aí de baixo **eu não testei quase nada**. Só li a documentação, pesquei uma ideia geral e traduzi pra você não precisar sofrer. Se quiser fuçar, fuce, mas vai por sua conta e risco. Pode ser que melhore algo, pode ser que não mude nada. Vai depender do áudio, da fase da lua e do humor do modelo 😅.
+Esses parâmetros aí de baixo **eu não testei quase nada** (apenas alguns). Só li a documentação, pesquei uma ideia geral e traduzi pra você não precisar sofrer. Se quiser fuçar, fuce, mas vai por sua conta e risco. Pode ser que melhore algo, pode ser que não mude nada. Vai depender do áudio, da fase da lua e do humor do modelo 😅.
 
-Se eu começar a usar alguma dessas opções nas minhas transcrições, prometo que volto aqui e atualizo esse trecho.
+Se eu começar a usar alguma dessas opções nas minhas transcrições, prometo que volto aqui e atualizo esse trecho. Alguns deles eu cheguei a testar de forma supercifical (explico nos argumentos).
 
 ---
 
 **`--length_penalty`**
 
-Controla a penalização para _sequências longas_. Valor típico: entre `0.6` e `1.0`. Se você notar que a transcrição tá muito curta ou longa, pode brincar com isso.
+Controla a penalização para _sequências longas_. Valor típico: entre `0.6` e `1.0`. Se você notar que a transcrição tá muito curta ou longa, pode brincar com isso. Eu não toquei neste argumento.
 
 ---
 
@@ -460,9 +460,35 @@ Controla a penalização para _sequências longas_. Valor típico: entre `0.6` e
 
 Permite suprimir tokens pelo ID. O valor `-1` (padrão) já suprime símbolos esquisitos e só mantém pontuações comuns. Deixa assim, a menos que você saiba o que está fazendo.
 
+Exemplo:
+
+```sh
+# Isso aqui vai cortar algumas coisas úteis (só exemplo).
+# Seu texto não terá: 'Olá', 'pessoal', ',', 'este', 'é', 'meu', 'texto', '.'
+# Obs: texto sem ponto e vírgula fica horrível
+whisper /caminho/do/seu/arquivo.mp4 \
+    --model turbo \
+    --language pt \
+    --suppress_tokens=38056,842,24811,11,4065,1136,9230,35503,13
+```
+
 _Quer saber o ID de um token específico?_
 
-Dá pra descobrir com um script usando o `tokenizer.encode("seu texto aqui")`, mas sinceramente... se chegou nesse ponto, você já tá no nível "mexendo no motor com o carro ligado" 😂 (talvez nem estaria lendo esse texto).
+Seguinte, se você que descobrir algum token para suprimir ou para qualquer outra coisa, veja um exemplo:
+
+```python
+>>> from whisper.tokenizer import get_tokenizer
+# get_tokenizer -> multilingual, num_languages=99, language='pt', task='transcribe'
+#                  True,         99                Qual idioma    Qual task
+>>> tokenizer = get_tokenizer(True, num_languages=99, language='pt', task='transcribe')
+# tokenizer.encode você passa o 'valor' e recebe os tokens List[int]
+>>> tokenizer.encode('Olá pessoal, este é meu texto.')
+[38056, 842, 24811, 11, 4065, 1136, 9230, 35503, 13]
+# tokenizer.decode você passa os tokens List[int] e recebe o 'valor'
+>>> tokenizer.decode([38056, 842, 24811, 11, 4065, 1136, 9230, 35503, 13])
+'Olá pessoal, este é meu texto.'
+>>>
+```
 
 ---
 
