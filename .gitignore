@@ -2,6 +2,11 @@
 db.json
 transcriptions
 
+# ⚠️ This is just for personal reasons (testing something)
+# ⚠️ You may remove it
+index.ts
+.prettierrc.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
