@@ -1,22 +1,38 @@
 # sussu(rro): CLI educacional com OpenAI Whisper
 
-> Ferramenta de linha de comando focada em educação e IA offline. \
-> Usa o poder do Whisper da OpenAI para transcrever áudios e vídeos de forma simples.
+> Ferramenta de linha de comando focada em educação e IA offline. Utiliza
+> o poder do Whisper da OpenAI para transcrever áudios e vídeos de forma
+> simples e eficiente.
+
+### 🎥 Parte 1 — CLI do Whisper (vídeo disponível a partir de 23/06/2025):
+
+- [Whisper OpenAI: Guia Completo de Transcrição com Inteligência Artificial (vídeo e áudio)](https://youtu.be/y15070biffg)
+
+### 💻 Parte 2 — Código do `sussu` (em breve):
+
+- _Whisper OpenAI + Python: implementando transcrição de áudio e vídeo no
+  seu código_
 
 ---
 
 ## Sobre o Whisper e a OpenAI
 
-Estava curioso para saber se a OpenAI usa o Whisper em seus próprios produtos, então questionei o ChatGPT...
+Estava curioso para saber se a OpenAI usa o Whisper em seus próprios
+produtos, então questionei o ChatGPT...
 
-> **Eu:** A OpenAI usa o Whisper internamente em algum recurso que as pessoas consomem? \
-> **ChatGPT:** Sim, a OpenAI usa o Whisper como base para recursos de transcrição e compreensão de áudio em produtos como o ChatGPT com entrada de voz. Ele também é utilizado em APIs que envolvem reconhecimento de fala, como a `speech-to-text` da OpenAI.
+> **Eu:** A OpenAI usa o Whisper internamente em algum recurso que as
+> pessoas consomem? \
+> **ChatGPT:** Sim, a OpenAI usa o Whisper como base para recursos de
+> transcrição e compreensão de áudio em produtos como o ChatGPT com
+> entrada de voz. Ele também é utilizado em APIs que envolvem
+> reconhecimento de fala, como a `speech-to-text` da OpenAI.
 
 ---
 
 ## Sobre este documento:
 
-Estou tentando manter este documento (`README.md`) sincronizado com o link abaixo. Caso não encontre o que procura aqui, acesse:
+Estou tentando manter este documento (`README.md`) sincronizado com o link
+abaixo. Caso não encontre o que procura aqui, acesse:
 
 - [Transcreva áudio com Python: Sussu CLI + OpenAI Whisper](https://www.otaviomiranda.com.br/2025/python-sussu-cli-openai-whisper/)
 
@@ -24,24 +40,32 @@ Estou tentando manter este documento (`README.md`) sincronizado com o link abaix
 
 ## Introdução geral
 
-Ao rodar este projeto, uma das primeiras coisas que você vai querer fazer é usar o comando `whisper` para fazer a transcrição inicial de algum vídeo ou áudio. Essa transcrição é um ótimo jeito de ver na prática como o **Whisper** trabalha e o que esperar dos resultados.
+Ao rodar este projeto, uma das primeiras coisas que você vai querer fazer
+é usar o comando `whisper` para fazer a transcrição inicial de algum vídeo
+ou áudio. Essa transcrição é um ótimo jeito de ver na prática como o
+**Whisper** trabalha e o que esperar dos resultados.
 
 - [Repositório oficial do `whisper`](https://github.com/openai/whisper)
 - [Repositório do `sussu`](https://github.com/luizomf/sussu)
 
-Vamos começar pela **instalação** do projeto, isso já coloca os comandos `sussu` e `whisper` funcionando direto no seu terminal.
+Vamos começar pela **instalação** do projeto, isso já coloca os comandos
+`sussu` e `whisper` funcionando direto no seu terminal.
 
 ---
 
 ## Instalação do `sussu`
 
-Se você encontrar alguma dificuldade com o ambiente, recomendo meu tutorial completo:
+Se você encontrar alguma dificuldade com o ambiente, recomendo meu
+tutorial completo:
 
 - [Ambiente Python Moderno 2025: UV, Ruff, Pyright, pyproject.toml e VS Code](https://www.youtube.com/watch?v=HuAc85cLRx0)
 
-Este projeto utiliza o **Python 3.11.9** por questões de compatibilidade com o **Whisper**. Evite alterar essa versão se não souber o que está fazendo, pois **eu já testei tudo para você**.
+Este projeto utiliza o **Python 3.11.9** por questões de compatibilidade
+com o **Whisper**. Evite alterar essa versão se não souber o que está
+fazendo, pois **eu já testei tudo para você**.
 
-Além disso, este projeto usa o [`uv`](https://docs.astral.sh/uv/) para o gerenciamento geral (pacotes, versão do Python, etc.).
+Além disso, este projeto usa o [`uv`](https://docs.astral.sh/uv/) para o
+gerenciamento geral (pacotes, versão do Python, etc.).
 
 Para instalar tudo, basta rodar o comando:
 
@@ -66,9 +90,15 @@ uv sync
 
 ## `ffmpeg`
 
-Você também precisará ter o **`ffmpeg`** instalado. Ele é um software de código aberto com várias ferramentas e bibliotecas para trabalhar com arquivos multimídia, especialmente áudio e vídeo. Embora o `whisper` foque na transcrição de áudio, o `ffmpeg` é quem permite que você transcreva seus vídeos diretamente, sem precisar convertê-los para áudio antes.
+Você também precisará ter o **`ffmpeg`** instalado. Ele é um software de
+código aberto com várias ferramentas e bibliotecas para trabalhar com
+arquivos multimídia, especialmente áudio e vídeo. Embora o `whisper` foque
+na transcrição de áudio, o `ffmpeg` é quem permite que você transcreva
+seus vídeos diretamente, sem precisar convertê-los para áudio antes.
 
-Para instalar o `ffmpeg` no seu sistema, você pode usar um dos comandos abaixo. Eles foram retirados diretamente do [repositório oficial do `whisper`](https://github.com/openai/whisper):
+Para instalar o `ffmpeg` no seu sistema, você pode usar um dos comandos
+abaixo. Eles foram retirados diretamente do
+[repositório oficial do `whisper`](https://github.com/openai/whisper):
 
 ```bash
 # No Ubuntu ou Debian
@@ -90,13 +120,17 @@ scoop install ffmpeg
 winget install --id=Gyan.FFmpeg -e
 ```
 
-**Observação:** Dos comandos listados, os únicos que testei e aprovei (✅) foram os para **macOS** e **Ubuntu**.
+**Observação:** Dos comandos listados, os únicos que testei e aprovei (✅)
+foram os para **macOS** e **Ubuntu**.
 
 ---
 
 ## Rodando pela Primeira Vez
 
-Para verificar se tudo foi instalado corretamente, você tem duas opções: **ativar o ambiente virtual** ou usar o comando **`uv run`**. Sugiro que você teste com `whisper -h`. Esse comando deve exibir a ajuda completa do `whisper`, indicando que ele está funcionando. Veja os exemplos:
+Para verificar se tudo foi instalado corretamente, você tem duas opções:
+**ativar o ambiente virtual** ou usar o comando **`uv run`**. Sugiro que
+você teste com `whisper -h`. Esse comando deve exibir a ajuda completa do
+`whisper`, indicando que ele está funcionando. Veja os exemplos:
 
 ```bash
 uv run whisper -h
@@ -104,15 +138,26 @@ uv run whisper -h
 whisper -h
 ```
 
-**Observação:** Editores de código como **VS Code** ou **Zed** podem ativar o ambiente virtual automaticamente ao abrir um novo terminal, desde que estejam configurados corretamente. Se for o seu caso, basta fechar e abrir o terminal novamente para que as mudanças façam efeito.
+**Observação:** Editores de código como **VS Code** ou **Zed** podem
+ativar o ambiente virtual automaticamente ao abrir um novo terminal, desde
+que estejam configurados corretamente. Se for o seu caso, basta fechar e
+abrir o terminal novamente para que as mudanças façam efeito.
 
 ---
 
 ## `whisper -h`: Entendendo Alguns Argumentos Importantes
 
-Ao digitar `whisper -h` ou `whisper --help`, você pode se surpreender com a quantidade de argumentos disponíveis. Mas não se preocupe! Você não precisa saber o que cada um deles faz. Na verdade, a maioria dos argumentos já vem com valores padrão que funcionam perfeitamente. No entanto, se você quiser personalizar um pouco o comportamento da ferramenta, vamos analisar alguns dos mais importantes.
+Ao digitar `whisper -h` ou `whisper --help`, você pode se surpreender com
+a quantidade de argumentos disponíveis. Mas não se preocupe! Você não
+precisa saber o que cada um deles faz. Na verdade, a maioria dos
+argumentos já vem com valores padrão que funcionam perfeitamente. No
+entanto, se você quiser personalizar um pouco o comportamento da
+ferramenta, vamos analisar alguns dos mais importantes.
 
-O `whisper` utiliza a biblioteca `argparse` do Python para gerar essa documentação de ajuda (`help`) completa e bem organizada. Se você tiver interesse em aprender mais sobre como criar interfaces de linha de comando profissionais com Python, confira meu vídeo:
+O `whisper` utiliza a biblioteca `argparse` do Python para gerar essa
+documentação de ajuda (`help`) completa e bem organizada. Se você tiver
+interesse em aprender mais sobre como criar interfaces de linha de comando
+profissionais com Python, confira meu vídeo:
 
 - [Python e argparse: Do Zero a uma CLI Profissional (Projeto Real na Prática)](https://www.youtube.com/watch?v=Ad6934NXn4A)
 
@@ -122,7 +167,9 @@ O `whisper` utiliza a biblioteca `argparse` do Python para gerar essa documenta�
 
 Vamos começar com os argumentos que você usará com mais frequência:
 
-**`audio`**: Este é o **argumento posicional** principal. Ele representa o caminho completo (localização) do arquivo de áudio ou vídeo que você quer transcrever.
+**`audio`**: Este é o **argumento posicional** principal. Ele representa o
+caminho completo (localização) do arquivo de áudio ou vídeo que você quer
+transcrever.
 
 **Exemplo:**
 
@@ -130,13 +177,20 @@ Vamos começar com os argumentos que você usará com mais frequência:
 whisper /caminho/do/seu/arquivo.mp4
 ```
 
-No exemplo acima, você notou que especificamos apenas o caminho do arquivo de vídeo. Nas próximas seções, vou detalhar as opções que mais utilizo para personalizar a transcrição.
+No exemplo acima, você notou que especificamos apenas o caminho do arquivo
+de vídeo. Nas próximas seções, vou detalhar as opções que mais utilizo
+para personalizar a transcrição.
 
 ---
 
-**`--model MODEL`**: Este argumento serve para **definir qual modelo será usado na transcrição** do seu áudio ou vídeo. Ele é opcional, e o valor padrão é `turbo`. O modelo `turbo` é excelente: rápido e multilíngue, mas requer cerca de **6GB de VRAM** para rodar.
+**`--model MODEL`**: Este argumento serve para **definir qual modelo será
+usado na transcrição** do seu áudio ou vídeo. Ele é opcional, e o valor
+padrão é `turbo`. O modelo `turbo` é excelente: rápido e multilíngue, mas
+requer cerca de **6GB de VRAM** para rodar.
 
-Talvez você queira usar outros modelos que exigem mais ou menos recursos do seu hardware, ou que possuem mais ou menos parâmetros (como `base`, `small`, `medium`, etc.).
+Talvez você queira usar outros modelos que exigem mais ou menos recursos
+do seu hardware, ou que possuem mais ou menos parâmetros (como `base`,
+`small`, `medium`, etc.).
 
 Aqui estão os modelos disponíveis e seus requisitos aproximados de VRAM:
 
@@ -144,14 +198,23 @@ Aqui estão os modelos disponíveis e seus requisitos aproximados de VRAM:
 - **`base`**: 74M parâmetros, `base.en` e `base`, VRAM ~1 GB
 - **`small`**: 244M parâmetros, `small.en` e `small`, VRAM ~2 GB
 - **`medium`**: 769M parâmetros, `medium.en` e `medium`, VRAM ~5 GB
-- **`large`**: 1550M parâmetros, `large`, `large-v2` e `large-v3`, VRAM ~10 GB
+- **`large`**: 1550M parâmetros, `large`, `large-v2` e `large-v3`, VRAM
+  ~10 GB
 - **`turbo`**: 809M parâmetros, `turbo`, VRAM ~6 GB
 
-**VRAM** é um tipo de memória RAM especializada que as placas de vídeo (GPUs) usam. Mas não se preocupe se você não tiver uma placa de vídeo dedicada! Se seu computador compartilha a RAM com a GPU, o que acontece em Macs com chips Apple Silicon (M1, M2, M3 e posteriores), por exemplo, você conseguirá usar os modelos do Whisper normalmente.
+**VRAM** é um tipo de memória RAM especializada que as placas de vídeo
+(GPUs) usam. Mas não se preocupe se você não tiver uma placa de vídeo
+dedicada! Se seu computador compartilha a RAM com a GPU, o que acontece em
+Macs com chips Apple Silicon (M1, M2, M3 e posteriores), por exemplo, você
+conseguirá usar os modelos do Whisper normalmente.
 
-Nesses casos, o que realmente limita é a **quantidade total de memória RAM disponível no seu sistema**. Por exemplo: se você tem apenas 8GB de RAM, o ideal é testar os modelos `tiny`, `base` ou `small`.
+Nesses casos, o que realmente limita é a **quantidade total de memória RAM
+disponível no seu sistema**. Por exemplo: se você tem apenas 8GB de RAM, o
+ideal é testar os modelos `tiny`, `base` ou `small`.
 
-A partir do modelo `medium`, é bem provável que você perceba uma **queda drástica no desempenho geral da sua máquina**, já que a memória será completamente consumida.
+A partir do modelo `medium`, é bem provável que você perceba uma **queda
+drástica no desempenho geral da sua máquina**, já que a memória será
+completamente consumida.
 
 **Exemplo:**
 
@@ -161,7 +224,12 @@ whisper /caminho/do/seu/arquivo.mp4 --model large-v2
 
 ---
 
-**`--device DEVICE`**: Este argumento é para você que possui uma **placa de vídeo NVIDIA com drivers CUDA** e uma versão compatível com o PyTorch. Se for o seu caso, vale a pena usar `--device cuda` para aproveitar o processamento da GPU. Caso contrário, não se preocupe em alterar esta opção, o padrão é `cpu` (processamento pela CPU) e funcionará perfeitamente.
+**`--device DEVICE`**: Este argumento é para você que possui uma **placa
+de vídeo NVIDIA com drivers CUDA** e uma versão compatível com o PyTorch.
+Se for o seu caso, vale a pena usar `--device cuda` para aproveitar o
+processamento da GPU. Caso contrário, não se preocupe em alterar esta
+opção, o padrão é `cpu` (processamento pela CPU) e funcionará
+perfeitamente.
 
 **Exemplo:**
 
@@ -171,17 +239,23 @@ whisper /caminho/do/seu/arquivo.mp4 --model large-v2 --device cpu
 
 ---
 
-**`--output_dir` ou `-o`**: Define o **caminho da pasta onde as transcrições serão salvas**. Por padrão, os arquivos serão salvos na raiz do projeto (`.`).
+**`--output_dir` ou `-o`**: Define o **caminho da pasta onde as
+transcrições serão salvas**. Por padrão, os arquivos serão salvos na raiz
+do projeto (`.`).
 
 ---
 
-**`--output_format` ou `-f`**: Permite que você escolha o **formato da transcrição ou legenda** gerada. As opções disponíveis são: `txt`, `vtt`, `srt`, `tsv`, `json` e `all` (que gera todos os formatos). O padrão é `all`.
+**`--output_format` ou `-f`**: Permite que você escolha o **formato da
+transcrição ou legenda** gerada. As opções disponíveis são: `txt`, `vtt`,
+`srt`, `tsv`, `json` e `all` (que gera todos os formatos). O padrão é
+`all`.
 
 ---
 
 **Exemplo:**
 
-O arquivo de saída será `srt` (SubRip) na pasta indicada em `-o`. Essa pasta será criada caso não exista.
+O arquivo de saída será `srt` (SubRip) na pasta indicada em `-o`. Essa
+pasta será criada caso não exista.
 
 ```bash
 whisper /caminho/do/seu/arquivo.mp4 --model turbo -o caminho/da/pasta_de_saida -f srt
@@ -189,7 +263,10 @@ whisper /caminho/do/seu/arquivo.mp4 --model turbo -o caminho/da/pasta_de_saida -
 
 ---
 
-**`--task`**: Com este argumento, você pode escolher entre **transcrever o áudio** no idioma original ou **traduzir para o inglês**. As opções são `transcribe` (o padrão, que transcreve no idioma falado no áudio) ou `translate` (que traduz o conteúdo para o inglês).
+**`--task`**: Com este argumento, você pode escolher entre **transcrever o
+áudio** no idioma original ou **traduzir para o inglês**. As opções são
+`transcribe` (o padrão, que transcreve no idioma falado no áudio) ou
+`translate` (que traduz o conteúdo para o inglês).
 
 **Exemplo:**
 
@@ -199,7 +276,10 @@ whisper /caminho/do/seu/arquivo.mp4 --model turbo --task transcribe
 
 ---
 
-**`--language`**: Este argumento permite que você **especifique o idioma falado no áudio ou vídeo**. Existem muitas opções de idiomas disponíveis. Se você não informar esse argumento, o `whisper` é inteligente o suficiente para detectar automaticamente o idioma do conteúdo.
+**`--language`**: Este argumento permite que você **especifique o idioma
+falado no áudio ou vídeo**. Existem muitas opções de idiomas disponíveis.
+Se você não informar esse argumento, o `whisper` é inteligente o
+suficiente para detectar automaticamente o idioma do conteúdo.
 
 ---
 
@@ -244,7 +324,9 @@ Forma longa (language name):
 
 - Exemplo para português do Brasil: `--language Portuguese`
 
-Se precisar de um dicionário completo com todos os idiomas e seus códigos, ele está disponível em `whisper.tokenizer.LANGUAGES` dentro do código do `whisper`.
+Se precisar de um dicionário completo com todos os idiomas e seus códigos,
+ele está disponível em `whisper.tokenizer.LANGUAGES` dentro do código do
+`whisper`.
 
 **Exemplo:**
 
@@ -259,19 +341,28 @@ whisper /caminho/do/seu/arquivo.mp4 --language pt
 
 ---
 
-**`--temperature`:** controla a "criatividade" do modelo. Vai de `0.0` a `1.0`. Quanto mais alto, mais liberdade o modelo tem pra decidir os próximos tokens. Esse parâmetro interage com `--beam_size`, `--patience` e `--best_of`.
+**`--temperature`:** controla a "criatividade" do modelo. Vai de `0.0` a
+`1.0`. Quanto mais alto, mais liberdade o modelo tem pra decidir os
+próximos tokens. Esse parâmetro interage com `--beam_size`, `--patience` e
+`--best_of`.
 
 ---
 
-**`--beam_size`:** número de hipóteses que o modelo mantém em paralelo. Pensa como se ele testasse vários caminhos ao mesmo tempo e no fim escolhesse o melhor. O padrão é `5` e **só funciona se `--temperature == 0.0`**.
+**`--beam_size`:** número de hipóteses que o modelo mantém em paralelo.
+Pensa como se ele testasse vários caminhos ao mesmo tempo e no fim
+escolhesse o melhor. O padrão é `5` e **só funciona se
+`--temperature == 0.0`**.
 
 ---
 
-**`--patience`:** fator de tolerância que faz o modelo continuar explorando novas hipóteses mesmo depois de achar uma aceitável. Requer `--temperature == 0.0` e `--beam_size > 1`.
+**`--patience`:** fator de tolerância que faz o modelo continuar
+explorando novas hipóteses mesmo depois de achar uma aceitável. Requer
+`--temperature == 0.0` e `--beam_size > 1`.
 
 ---
 
-**`--best_of`:** número de amostras diferentes geradas antes de escolher a melhor. Funciona apenas quando `--temperature > 0.0`.
+**`--best_of`:** número de amostras diferentes geradas antes de escolher a
+melhor. Funciona apenas quando `--temperature > 0.0`.
 
 ---
 
@@ -294,22 +385,31 @@ whisper /caminho/do/seu/arquivo.mp4 --language pt
   🔴 --best_of (ignorado)
 ```
 
-**Importante:** Quanto maiores os valores de `--beam_size`, `--patience` e `--best_of`, mais lento e "indeciso" o modelo tende a ficar. Isso acontece porque ele precisa gerar mais hipóteses ou amostras e, em seguida, tomar uma decisão entre elas. Faça testes rápidos para confirmar esse comportamento.
+**Importante:** Quanto maiores os valores de `--beam_size`, `--patience` e
+`--best_of`, mais lento e "indeciso" o modelo tende a ficar. Isso acontece
+porque ele precisa gerar mais hipóteses ou amostras e, em seguida, tomar
+uma decisão entre elas. Faça testes rápidos para confirmar esse
+comportamento.
 
 **Observação sincera:**
 
-Na prática, o modelo vai responder como foi treinado, independente do seu capricho nas configs. Trocar `temperature`, `beam_size`, `patience` e afins pode virar desperdício de tempo.
+Na prática, o modelo vai responder como foi treinado, independente do seu
+capricho nas configs. Trocar `temperature`, `beam_size`, `patience` e
+afins pode virar desperdício de tempo.
 
 **Recomendação direta:** só mexa nessas opções se:
 
 - o modelo começar a repetir palavras (loop)
 - estiver errando demais em blocos grandes
 
-Se for só por causa de uma ou duas palavras... aceita e segue. Ou então faz igual eu: **testa tudo por uma semana e conclui que o padrão já era bom** 😅
+Se for só por causa de uma ou duas palavras... aceita e segue. Ou então
+faz igual eu: **testa tudo por uma semana e conclui que o padrão já era
+bom** 😅
 
 **Exemplo:**
 
-O arquivo de saída será `srt` (SubRip) na pasta indicada em `-o`. Essa pasta será criada caso não exista.
+O arquivo de saída será `srt` (SubRip) na pasta indicada em `-o`. Essa
+pasta será criada caso não exista.
 
 ```bash
 # Greedy: Mais rápido, mas pode errar mais por considerar apenas uma hipótese por vez.
@@ -325,33 +425,65 @@ whisper /caminho/do/seu/arquivo.mp4 --temperature 0.7 --best_of 5
 
 ---
 
-**`--temperature_increment_on_fallback`**: Este argumento permite que você **aumente a temperatura do modelo em casos de falha na transcrição**. Se o modelo encontrar dificuldades na temperatura `0.0`, ele fará um "fallback" e tentará com a temperatura incrementada. O valor também varia de `0.0` a `1.0`. No entanto, **cuidado: definir `0.0` para este argumento causará um erro `ZeroDivisionError: float division by zero`** (isso pode ser um pequeno "bugzinho" 🫣, mas, de fato, não faria muito sentido usar zero aqui, já que o objetivo é justamente _incrementar_ a temperatura). O valor padrão é `0.2`.
+**`--temperature_increment_on_fallback`**: Este argumento permite que você
+**aumente a temperatura do modelo em casos de falha na transcrição**. Se o
+modelo encontrar dificuldades na temperatura `0.0`, ele fará um "fallback"
+e tentará com a temperatura incrementada. O valor também varia de `0.0` a
+`1.0`. No entanto, **cuidado: definir `0.0` para este argumento causará um
+erro `ZeroDivisionError: float division by zero`** (isso pode ser um
+pequeno "bugzinho" 🫣, mas, de fato, não faria muito sentido usar zero
+aqui, já que o objetivo é justamente _incrementar_ a temperatura). O valor
+padrão é `0.2`.
 
 ---
 
-**`--max_line_width`**: Define a **quantidade máxima de caracteres por linha** na sua legenda. O valor padrão é `1000` (um limite bastante alto, codificado diretamente na classe `SubtitlesWriter` do `whisper`). Eu, particularmente, costumo usar `45` para uma melhor legibilidade. **Importante:** Se este argumento for utilizado, ele anula o `--max_words_per_line`. **Requer `--word_timestamps True`**.
+**`--max_line_width`**: Define a **quantidade máxima de caracteres por
+linha** na sua legenda. O valor padrão é `1000` (um limite bastante alto,
+codificado diretamente na classe `SubtitlesWriter` do `whisper`). Eu,
+particularmente, costumo usar `45` para uma melhor legibilidade.
+**Importante:** Se este argumento for utilizado, ele anula o
+`--max_words_per_line`. **Requer `--word_timestamps True`**.
 
 ---
 
-**`--max_line_count`**: Controla a **quantidade máxima de linhas por legenda** (ou "bloco" de texto). Eu uso o valor `2`, mas, nos meus testes, percebi que isso força todas as legendas a terem sempre duas linhas. Para mim, não é um problema, mas vale a pena você testar para ver como se adapta ao seu caso. **Requer `--word_timestamps True`**.
+**`--max_line_count`**: Controla a **quantidade máxima de linhas por
+legenda** (ou "bloco" de texto). Eu uso o valor `2`, mas, nos meus testes,
+percebi que isso força todas as legendas a terem sempre duas linhas. Para
+mim, não é um problema, mas vale a pena você testar para ver como se
+adapta ao seu caso. **Requer `--word_timestamps True`**.
 
 ---
 
-**`--max_words_per_line`**: Determina a **quantidade máxima de palavras por linha** na legenda. O padrão também é um valor alto, `1000` (também "hardcoded" na classe `SubtitlesWriter`). Embora eu não costume usá-lo, acredito que `5` palavras por linha pode resultar em uma leitura mais confortável. **Atenção:** Será anulado por `--max_line_width` caso você use ambos no mesmo comando. **Requer `--word_timestamps True`**.
+**`--max_words_per_line`**: Determina a **quantidade máxima de palavras
+por linha** na legenda. O padrão também é um valor alto, `1000` (também
+"hardcoded" na classe `SubtitlesWriter`). Embora eu não costume usá-lo,
+acredito que `5` palavras por linha pode resultar em uma leitura mais
+confortável. **Atenção:** Será anulado por `--max_line_width` caso você
+use ambos no mesmo comando. **Requer `--word_timestamps True`**.
 
 ---
 
-**`--highlight_words`**: Este é o argumento responsável por criar o **efeito de "karaokê"** na sua transcrição. Ele faz com que cada palavra falada seja sublinhada no momento exato em que é pronunciada. **Requer `--word_timestamps True`**.
+**`--highlight_words`**: Este é o argumento responsável por criar o
+**efeito de "karaokê"** na sua transcrição. Ele faz com que cada palavra
+falada seja sublinhada no momento exato em que é pronunciada. **Requer
+`--word_timestamps True`**.
 
 ---
 
-**`--word_timestamps`**: Este argumento é a **chave** para ativar os recursos de sincronização detalhada. Ao defini-lo como `True`, o modelo passará a gerar **timestamps para cada palavra**, em vez de apenas por blocos de frase. Isso pode, sim, aumentar consideravelmente o tempo de transcrição, mas é um requisito fundamental para que vários outros argumentos (como os de formatação de linha e destaque de palavras) funcionem. O valor padrão é `False`.
+**`--word_timestamps`**: Este argumento é a **chave** para ativar os
+recursos de sincronização detalhada. Ao defini-lo como `True`, o modelo
+passará a gerar **timestamps para cada palavra**, em vez de apenas por
+blocos de frase. Isso pode, sim, aumentar consideravelmente o tempo de
+transcrição, mas é um requisito fundamental para que vários outros
+argumentos (como os de formatação de linha e destaque de palavras)
+funcionem. O valor padrão é `False`.
 
 ---
 
 **Exemplo Completo de Transcrição Detalhada**
 
-Veja um exemplo de como combinar vários desses argumentos para obter uma transcrição formatada e com destaque de palavras:
+Veja um exemplo de como combinar vários desses argumentos para obter uma
+transcrição formatada e com destaque de palavras:
 
 ```bash
 # A '\' (barra invertida no final da linha) é usada apenas para indicar que
@@ -371,32 +503,49 @@ whisper meu_video.mp4 \
 
 **`--initial_prompt`**:
 
-Este é um texto opcional que serve como um **"empurrãozinho" para o modelo antes que ele comece a transcrever**. Funciona como uma dica de estilo ou contexto. No entanto, é importante notar que ele só influencia a **primeira "janela" do áudio** (que por padrão tem 30 segundos).
+Este é um texto opcional que serve como um **"empurrãozinho" para o modelo
+antes que ele comece a transcrever**. Funciona como uma dica de estilo ou
+contexto. No entanto, é importante notar que ele só influencia a
+**primeira "janela" do áudio** (que por padrão tem 30 segundos).
 
 **Exemplo Prático:**
 
-Se o seu vídeo é sobre programação, especificamente Python, você pode passar um prompt como este:
+Se o seu vídeo é sobre programação, especificamente Python, você pode
+passar um prompt como este:
 
 ```bash
 --initial_prompt "vídeo de uma explicação sobre programação com destaque para bibliotecas do Python"
 ```
 
-Isso pode ajudar o modelo a reconhecer e transcrever termos técnicos de programação e Python com mais precisão. Mas, como dito, não espere milagres para o vídeo inteiro; essa influência é apenas um toque inicial. Para as janelas seguintes, o modelo pode usar o texto transcrito anteriormente, se a opção `--condition_on_previous_text` estiver como `True` (que é o padrão).
+Isso pode ajudar o modelo a reconhecer e transcrever termos técnicos de
+programação e Python com mais precisão. Mas, como dito, não espere
+milagres para o vídeo inteiro; essa influência é apenas um toque inicial.
+Para as janelas seguintes, o modelo pode usar o texto transcrito
+anteriormente, se a opção `--condition_on_previous_text` estiver como
+`True` (que é o padrão).
 
 **Analogia para Entender Melhor:**
 
 > Imagine que é como dizer para um cantor, antes de ele subir no palco: \
 > "Tem 300 mil pessoas te esperando, detona lá!" \
-> Ele vai subir já no clima certo, mas o resto da performance dependerá do show em si. \
-> Da mesma forma, o modelo continua a transcrição com base no que "ouviu" e transcreveu depois do prompt inicial.
+> Ele vai subir já no clima certo, mas o resto da performance dependerá do
+> show em si. \
+> Da mesma forma, o modelo continua a transcrição com base no que "ouviu"
+> e transcreveu depois do prompt inicial.
 
 **Cuidados com o `--initial_prompt`**:
 
-O `--initial_prompt` pode afetar significativamente a forma como o modelo do `whisper` opera. Em alguns casos, ele pode levar à geração de legendas excessivamente longas ou até mesmo fazer o modelo entrar em **loops de repetição**.
+O `--initial_prompt` pode afetar significativamente a forma como o modelo
+do `whisper` opera. Em alguns casos, ele pode levar à geração de legendas
+excessivamente longas ou até mesmo fazer o modelo entrar em **loops de
+repetição**.
 
-**Recomendação:** Antes de aplicar um prompt em um vídeo completo, faça **testes rápidos em um trecho menor** do seu vídeo para observar o resultado. Isso evita surpresas e economiza tempo de processamento.
+**Recomendação:** Antes de aplicar um prompt em um vídeo completo, faça
+**testes rápidos em um trecho menor** do seu vídeo para observar o
+resultado. Isso evita surpresas e economiza tempo de processamento.
 
-Para cortar facilmente um pedaço do seu vídeo para testes, você pode usar o `ffmpeg` com o seguinte comando:
+Para cortar facilmente um pedaço do seu vídeo para testes, você pode usar
+o `ffmpeg` com o seguinte comando:
 
 ```bash
 # Com ffmpeg
@@ -410,25 +559,43 @@ whisper meu_video.mp4 --clip_timestamps 60,120
 
 **Entendendo o Comando `ffmpeg`:**
 
-- `-i entrada.mp4`: Define o arquivo de vídeo de entrada (o seu vídeo original).
-- `-c:v copy`: Copia o codec de vídeo do arquivo original, sem recodificar. Isso torna o processo muito mais rápido!
-- `-c:a copy`: Copia o codec de áudio do arquivo original, também sem recodificar.
-- `-ss 00:05:00.000`: Especifica o ponto de início do corte (neste exemplo, 5 minutos e 0 segundos do vídeo original).
-- `-to 00:10:00.000`: Define o ponto final do corte (neste exemplo, 10 minutos e 0 segundos do vídeo original).
+- `-i entrada.mp4`: Define o arquivo de vídeo de entrada (o seu vídeo
+  original).
+- `-c:v copy`: Copia o codec de vídeo do arquivo original, sem
+  recodificar. Isso torna o processo muito mais rápido!
+- `-c:a copy`: Copia o codec de áudio do arquivo original, também sem
+  recodificar.
+- `-ss 00:05:00.000`: Especifica o ponto de início do corte (neste
+  exemplo, 5 minutos e 0 segundos do vídeo original).
+- `-to 00:10:00.000`: Define o ponto final do corte (neste exemplo, 10
+  minutos e 0 segundos do vídeo original).
 
-Este comando irá gerar um novo arquivo de vídeo (`saida.mp4`) contendo apenas o segmento entre 00:05:00 e 00:10:00 do vídeo original. Essa técnica é extremamente útil, especialmente para vídeos mais longos (como os meus de 30+ minutos), pois permite testar configurações específicas em um pedaço pequeno sem ter que processar o vídeo inteiro.
+Este comando irá gerar um novo arquivo de vídeo (`saida.mp4`) contendo
+apenas o segmento entre 00:05:00 e 00:10:00 do vídeo original. Essa
+técnica é extremamente útil, especialmente para vídeos mais longos (como
+os meus de 30+ minutos), pois permite testar configurações específicas em
+um pedaço pequeno sem ter que processar o vídeo inteiro.
 
 ---
 
 **`--condition_on_previous_text`**:
 
-Este argumento crucial define se **o texto que já foi transcrito será usado como contexto** para ajudar a transcrever a próxima "janela" do áudio.
+Este argumento crucial define se **o texto que já foi transcrito será
+usado como contexto** para ajudar a transcrever a próxima "janela" do
+áudio.
 
-- `True` (padrão): É a configuração ideal para a maioria dos casos. Ela ajuda a manter a **fluidez e a consistência** do texto, garantindo uma boa coesão entre os blocos da transcrição.
-- `False`: Desativa o uso do contexto anterior. Isso pode ser útil para **evitar "loops de erro"**, onde o modelo fica repetindo frases ou palavras indefinidamente.
+- `True` (padrão): É a configuração ideal para a maioria dos casos. Ela
+  ajuda a manter a **fluidez e a consistência** do texto, garantindo uma
+  boa coesão entre os blocos da transcrição.
+- `False`: Desativa o uso do contexto anterior. Isso pode ser útil para
+  **evitar "loops de erro"**, onde o modelo fica repetindo frases ou
+  palavras indefinidamente.
 
 > _Exemplo de Uso:_ \
-> Se a transcrição começar a errar e ficar repetindo, por exemplo, `"Olá, pessoal, hoje vamos falar sobre..."` em loop, desativar este argumento (`--condition_on_previous_text=False`) pode quebrar esse ciclo vicioso.
+> Se a transcrição começar a errar e ficar repetindo, por exemplo,
+> `"Olá, pessoal, hoje vamos falar sobre..."` em loop, desativar este
+> argumento (`--condition_on_previous_text=False`) pode quebrar esse ciclo
+> vicioso.
 
 ---
 
@@ -436,29 +603,44 @@ Este argumento crucial define se **o texto que já foi transcrito será usado co
 
 Para otimizar suas transcrições, considere as seguintes dicas:
 
-- Para vídeos **bem gravados**, com **áudio limpo** e **sem erros ou repetições evidentes**, mantenha o padrão: `--condition_on_previous_text=True`.
-- Se o modelo começar a **repetir frases ou palavras** de forma indesejada, experimente mudar para `--condition_on_previous_text=False`.
-- O `--initial_prompt` pode ajudar **somente no início** da transcrição. Não espere que ele resolva problemas de consistência para o vídeo inteiro, mas pode ser útil para guiar o modelo em termos específicos.
+- Para vídeos **bem gravados**, com **áudio limpo** e **sem erros ou
+  repetições evidentes**, mantenha o padrão:
+  `--condition_on_previous_text=True`.
+- Se o modelo começar a **repetir frases ou palavras** de forma
+  indesejada, experimente mudar para `--condition_on_previous_text=False`.
+- O `--initial_prompt` pode ajudar **somente no início** da transcrição.
+  Não espere que ele resolva problemas de consistência para o vídeo
+  inteiro, mas pode ser útil para guiar o modelo em termos específicos.
 
 ---
 
 ### Parâmetros que não usei (ou quase não usei 🫣):
 
-Esses parâmetros aí de baixo **eu não testei quase nada** (apenas alguns). Só li a documentação, pesquei uma ideia geral e traduzi pra você não precisar sofrer. Se quiser fuçar, fuce, mas vai por sua conta e risco. Pode ser que melhore algo, pode ser que não mude nada. Vai depender do áudio, da fase da lua e do humor do modelo 😅.
+Esses parâmetros aí de baixo **eu não testei quase nada** (apenas alguns).
+Só li a documentação, pesquei uma ideia geral e traduzi pra você não
+precisar sofrer. Se quiser fuçar, fuce, mas vai por sua conta e risco.
+Pode ser que melhore algo, pode ser que não mude nada. Vai depender do
+áudio, da fase da lua e do humor do modelo 😅.
 
-Se eu começar a usar alguma dessas opções nas minhas transcrições, prometo que volto aqui e atualizo esse trecho. Alguns deles eu cheguei a testar de forma supercifical (explico nos argumentos).
+Se eu começar a usar alguma dessas opções nas minhas transcrições, prometo
+que volto aqui e atualizo esse trecho. Alguns deles eu cheguei a testar de
+forma supercifical (explico nos argumentos).
 
 ---
 
 **`--length_penalty`**
 
-Controla a penalização para _sequências longas_. Valor típico: entre `0.6` e `1.0`. Se você notar que a transcrição tá muito curta ou longa, pode brincar com isso. Eu não toquei neste argumento.
+Controla a penalização para _sequências longas_. Valor típico: entre `0.6`
+e `1.0`. Se você notar que a transcrição tá muito curta ou longa, pode
+brincar com isso. Eu não toquei neste argumento.
 
 ---
 
 **`--suppress_tokens`**
 
-Permite suprimir tokens pelo ID. O valor `-1` (padrão) já suprime símbolos esquisitos e só mantém pontuações comuns. Deixa assim, a menos que você saiba o que está fazendo.
+Permite suprimir tokens pelo ID. O valor `-1` (padrão) já suprime símbolos
+esquisitos e só mantém pontuações comuns. Deixa assim, a menos que você
+saiba o que está fazendo.
 
 Exemplo:
 
@@ -474,7 +656,8 @@ whisper /caminho/do/seu/arquivo.mp4 \
 
 _Quer saber o ID de um token específico?_
 
-Seguinte, se você que descobrir algum token para suprimir ou para qualquer outra coisa, veja um exemplo:
+Seguinte, se você que descobrir algum token para suprimir ou para qualquer
+outra coisa, veja um exemplo:
 
 ```python
 >>> from whisper.tokenizer import get_tokenizer
@@ -494,12 +677,14 @@ Seguinte, se você que descobrir algum token para suprimir ou para qualquer outr
 
 **`--fp16`**
 
-Usa precisão *float16* para acelerar em GPU.
+Usa precisão _float16_ para acelerar em GPU.
 
-No Mac M1, por exemplo, eu sempre uso `--fp16 False`, assim ele não fica mostrando warning de que trocou pra *float32*. Essa troca acontece automaticamente se o seu hardware **não** suportar *float16*, então:
+No Mac M1, por exemplo, eu sempre uso `--fp16 False`, assim ele não fica
+mostrando warning de que trocou pra _float32_. Essa troca acontece
+automaticamente se o seu hardware **não** suportar _float16_, então:
 
-* **Se suportar:** passa direto com *float16*.
-* **Se não suportar:** ele mostra um aviso e troca para *float32* sozinho.
+- **Se suportar:** passa direto com _float16_.
+- **Se não suportar:** ele mostra um aviso e troca para _float32_ sozinho.
 
 Exemplo do warning:
 
@@ -511,25 +696,38 @@ FP16 is not supported on CPU; using FP32 instead
 
 **`--compression_ratio_threshold`**
 
-Se a razão de compressão (gzip) do texto for muito alta, ele assume que houve erro (textos muito repetitivos). Valor padrão é `2.4`. Útil pra detectar _loop de repetição_.
+Se a razão de compressão (gzip) do texto for muito alta, ele assume que
+houve erro (textos muito repetitivos). Valor padrão é `2.4`. Útil pra
+detectar _loop de repetição_.
 
 **Como funciona a ideia:**
 
-O Whisper pega o texto, compacta com gzip e compara o **tamanho original** com o **tamanho compactado** para calcular a **razão de compressão**. Textos repetitivos geram compressões mais eficientes, ou seja, **razão mais alta**.
+O Whisper pega o texto, compacta com gzip e compara o **tamanho original**
+com o **tamanho compactado** para calcular a **razão de compressão**.
+Textos repetitivos geram compressões mais eficientes, ou seja, **razão
+mais alta**.
 
 - `"Olá, olá, olá, olá, olá..."` → compacta muito → **alta razão**
-- `"O rato roeu a roupa do rei de Roma."` → mais diversidade → **menor razão**
+- `"O rato roeu a roupa do rei de Roma."` → mais diversidade → **menor
+  razão**
 
-Se a razão ultrapassar o limite definido (padrão: `2.4`), o Whisper **descarta o trecho** por considerá-lo problemático (repetitivo, bugado etc).
+Se a razão ultrapassar o limite definido (padrão: `2.4`), o Whisper
+**descarta o trecho** por considerá-lo problemático (repetitivo, bugado
+etc).
 
-Se sua transcrição estiver falhando **sem motivo claro**, esse filtro pode ser o culpado.
-Teste com `--compression_ratio_threshold 0` e veja se melhora.
+Se sua transcrição estiver falhando **sem motivo claro**, esse filtro pode
+ser o culpado. Teste com `--compression_ratio_threshold 0` e veja se
+melhora.
 
 ---
 
 **`--logprob_threshold`**
 
-Se a média do logaritmo da probabilidade (logprob) dos tokens estiver abaixo disso, ele trata como erro. Padrão: `-1.0`. Você consegue ver `avg_logprob` (média do logaritmo da probabilidade) das frases transcritas pelo Whisper no arquivo `.json` final gerado. Este arquivo contém algo similar a isso:
+Se a média do logaritmo da probabilidade (logprob) dos tokens estiver
+abaixo disso, ele trata como erro. Padrão: `-1.0`. Você consegue ver
+`avg_logprob` (média do logaritmo da probabilidade) das frases transcritas
+pelo Whisper no arquivo `.json` final gerado. Este arquivo contém algo
+similar a isso:
 
 ```json
 {
@@ -566,47 +764,79 @@ Se a média do logaritmo da probabilidade (logprob) dos tokens estiver abaixo di
 }
 ```
 
-Aqui `avg_logprob` é `-0.08265516709308235`. Quanto mais próximo de `0`, mais confiante está o modelo.
+Aqui `avg_logprob` é `-0.08265516709308235`. Quanto mais próximo de `0`,
+mais confiante está o modelo.
 
-Suponha que o modelo está descartando coisas na transcrição. Você poderia testar `--logprob_threshold=-2.0` ou até `--logprob_threshold=-1000` (não descarta nada).
+Suponha que o modelo está descartando coisas na transcrição. Você poderia
+testar `--logprob_threshold=-2.0` ou até `--logprob_threshold=-1000` (não
+descarta nada).
 
-Isso pode gerar muito ruído aleatório na transcrição, mas pode fazer ele detectar o que você quer.
+Isso pode gerar muito ruído aleatório na transcrição, mas pode fazer ele
+detectar o que você quer.
 
-O contrário também é verdadeiro. Se usar `--logprob_threshold=-0.1` (por exemplo), o modelo vai pegar praticamente só o que tem certeza absoluta que tá certo. Isso não é uma coisa boa ou ruim, depende do contexto e do seu objetivo. Na dúvida, manter o padrão costuma ser uma escolha segura.
+O contrário também é verdadeiro. Se usar `--logprob_threshold=-0.1` (por
+exemplo), o modelo vai pegar praticamente só o que tem certeza absoluta
+que tá certo. Isso não é uma coisa boa ou ruim, depende do contexto e do
+seu objetivo. Na dúvida, manter o padrão costuma ser uma escolha segura.
 
-Quanto mais rigoroso, mais lento, porque ele vai tentar gerar várias hipóteses até alcançar esse nível de confiança. No fim das contas, ele vai te entregar um texto de qualquer jeito, mas pode demorar bem mais e talvez nem seja tão diferente assim.
+Quanto mais rigoroso, mais lento, porque ele vai tentar gerar várias
+hipóteses até alcançar esse nível de confiança. No fim das contas, ele vai
+te entregar um texto de qualquer jeito, mas pode demorar bem mais e talvez
+nem seja tão diferente assim.
 
 ---
 
 **`--no_speech_threshold`**
 
-Se o modelo acredita que é silêncio (probabilidade alta de `<|nospeech|>`) **e** a decodificação falha (`logprob_threshold`), ele descarta o trecho como sendo silêncio. Isso ajuda a cortar "respiros vazios" da transcrição.
+Se o modelo acredita que é silêncio (probabilidade alta de `<|nospeech|>`)
+**e** a decodificação falha (`logprob_threshold`), ele descarta o trecho
+como sendo silêncio. Isso ajuda a cortar "respiros vazios" da transcrição.
 
-Essa funcionalidade me encanta, e tenho planos futuros pra ela. Quem sabe a gente não volta a falar disso mais pra frente?
+Essa funcionalidade me encanta, e tenho planos futuros pra ela. Quem sabe
+a gente não volta a falar disso mais pra frente?
 
 ---
 
 **`--prepend_punctuations`** (com `--word_timestamps True`):
 
-Este argumento controla quais caracteres de pontuação que aparecem **antes** de uma palavra devem ser "colados" à palavra seguinte, em vez de serem tratados como um token separado.
+Este argumento controla quais caracteres de pontuação que aparecem
+**antes** de uma palavra devem ser "colados" à palavra seguinte, em vez de
+serem tratados como um token separado.
 
-- **Padrão**: `\"\'“¿([{-` (inclui aspas, parênteses, etc.) e requer `--word_timestamps True`.
+- **Padrão**: `\"\'“¿([{-` (inclui aspas, parênteses, etc.) e requer
+  `--word_timestamps True`.
 
-Em teoria, se o modelo gerasse, por exemplo, os tokens `(`, `arg`, `ument`, `os`, `)` separadamente (tipo: `[7, 33544, 2206, 329, 8]` que formariam `(argumentos)`), o `(` e o `arg` seriam unidos para formar `(arg`.
+Em teoria, se o modelo gerasse, por exemplo, os tokens `(`, `arg`,
+`ument`, `os`, `)` separadamente (tipo: `[7, 33544, 2206, 329, 8]` que
+formariam `(argumentos)`), o `(` e o `arg` seriam unidos para formar
+`(arg`.
 
-> **Observação Importante**: eu testei o `whisper` com os idiomas `Portuguese` e `English` (90% em `Portuguese`, que é meu caso de uso). Em nenhuma das legendas que gerei houve qualquer caso onde a pontuação viesse antes de alguma palavra. Na prática, eu realmente não usei este parâmetro.
+> **Observação Importante**: eu testei o `whisper` com os idiomas
+> `Portuguese` e `English` (90% em `Portuguese`, que é meu caso de uso).
+> Em nenhuma das legendas que gerei houve qualquer caso onde a pontuação
+> viesse antes de alguma palavra. Na prática, eu realmente não usei este
+> parâmetro.
 
 ---
 
 **`--append_punctuations`** (com `--word_timestamps True`):
 
-Este argumento controla quais caracteres de pontuação que aparecem **depois** de uma palavra devem ser "colados" à palavra anterior.
+Este argumento controla quais caracteres de pontuação que aparecem
+**depois** de uma palavra devem ser "colados" à palavra anterior.
 
-- **Padrão**: `\"\'.。,，!！?？:：”)]}、` (inclui aspas, pontos, vírgulas, interrogações, etc.) e requer `--word_timestamps True`.
+- **Padrão**: `\"\'.。,，!！?？:：”)]}、` (inclui aspas, pontos, vírgulas,
+  interrogações, etc.) e requer `--word_timestamps True`.
 
-Por exemplo, se os tokens gerados forem `Ok` e `?` separadamente, e o `?` estiver incluído nesta lista (o que já está por padrão), eles serão unidos para formar `Ok?`.
+Por exemplo, se os tokens gerados forem `Ok` e `?` separadamente, e o `?`
+estiver incluído nesta lista (o que já está por padrão), eles serão unidos
+para formar `Ok?`.
 
-**Dica Prática**: Esses argumentos de pontuação só farão uma diferença perceptível se você precisar que o ponto ou outro símbolo tenha um `timestamp` _exatamente_ separado da palavra, o que é um caso de uso bastante específico. Na maioria das situações, o padrão do `whisper` já é bastante robusto. Do contrário, e para simplificar, mantenha os valores padrão.
+**Dica Prática**: Esses argumentos de pontuação só farão uma diferença
+perceptível se você precisar que o ponto ou outro símbolo tenha um
+`timestamp` _exatamente_ separado da palavra, o que é um caso de uso
+bastante específico. Na maioria das situações, o padrão do `whisper` já é
+bastante robusto. Do contrário, e para simplificar, mantenha os valores
+padrão.
 
 ---
 
@@ -614,21 +844,25 @@ Por exemplo, se os tokens gerados forem `Ok` e `?` separadamente, e o `?` estive
 
 **`--threads`**
 
-Define o número de _threads_ que o modelo vai usar na CPU. Exemplo: `--threads 4`.
-Se não passar nada, ele usa o padrão da Torch (geralmente via MKL ou OMP).
+Define o número de _threads_ que o modelo vai usar na CPU. Exemplo:
+`--threads 4`. Se não passar nada, ele usa o padrão da Torch (geralmente
+via MKL ou OMP).
 
-Nos meus testes (Mac M1), usei `1, 4, 10, 100, 1000`. O resultado?
-Ele só criou mais _threads_ e usou mais CPU, **mas a velocidade de transcrição não mudou absolutamente nada**.
+Nos meus testes (Mac M1), usei `1, 4, 10, 100, 1000`. O resultado? Ele só
+criou mais _threads_ e usou mais CPU, **mas a velocidade de transcrição
+não mudou absolutamente nada**.
 
-Claro, meus testes foram superficiais. Pode ser que em outro sistema, com outra CPU (ou invocando Cthulhu no terminal), você veja alguma diferença.
+Claro, meus testes foram superficiais. Pode ser que em outro sistema, com
+outra CPU (ou invocando Cthulhu no terminal), você veja alguma diferença.
 Eu? Só vi o cooler suando.
 
 ---
 
 **`--clip_timestamps`**
 
-Permite transcrever ou traduzir apenas trechos específicos do áudio ou vídeo.
-Você passa os intervalos como pares `start,end` (em segundos). Pode usar vários.
+Permite transcrever ou traduzir apenas trechos específicos do áudio ou
+vídeo. Você passa os intervalos como pares `start,end` (em segundos). Pode
+usar vários.
 
 **Exemplos:**
 
@@ -636,7 +870,8 @@ Você passa os intervalos como pares `start,end` (em segundos). Pode usar vário
 - `--clip_timestamps 60,120` → de 1min até 2min
 - `--clip_timestamps 10,30,60,120` → dois trechos: 10s–30s e 1min–2min
 - ⚠️ `--clip_timestamps 270` → de 4min30s até o final
-- ⚠️ `--clip_timestamps 60,120,0` → transcreve de 1min–2min **e depois recomeça do zero até o fim**
+- ⚠️ `--clip_timestamps 60,120,0` → transcreve de 1min–2min **e depois
+  recomeça do zero até o fim**
 
 **Atenção:**
 
@@ -644,9 +879,12 @@ Esse último exemplo (`60,120,0`) parece um caso não previsto.
 
 O `0` vem depois de `120`, mas não forma um par `start,end`.
 
-Nos testes, isso gerou um comportamento curioso: o modelo transcreveu normalmente de 1min até 2min, **e depois do início até o final**.
+Nos testes, isso gerou um comportamento curioso: o modelo transcreveu
+normalmente de 1min até 2min, **e depois do início até o final**.
 
-Mesmo assim, o VLC interpretou direitinho. Ele realinhou os blocos e ignorou os duplicados, mostrando só o que fazia sentido cronológico (**aparentemente cortando o primeiro minuto**).
+Mesmo assim, o VLC interpretou direitinho. Ele realinhou os blocos e
+ignorou os duplicados, mostrando só o que fazia sentido cronológico
+(**aparentemente cortando o primeiro minuto**).
 
 ---
 
@@ -654,8 +892,11 @@ Mesmo assim, o VLC interpretou direitinho. Ele realinhou os blocos e ignorou os 
 
 Funciona junto com `--word_timestamps True`.
 
-Ele tenta detectar trechos de silêncio longos que o modelo pode ter "alucinado" (inventado texto).
+Ele tenta detectar trechos de silêncio longos que o modelo pode ter
+"alucinado" (inventado texto).
 
-Se você passar `--hallucination_silence_threshold 1.5`, ele vai **ignorar silêncios maiores que 1.5s que geraram texto suspeito**. Não toquei nesse argumento.
+Se você passar `--hallucination_silence_threshold 1.5`, ele vai **ignorar
+silêncios maiores que 1.5s que geraram texto suspeito**. Não toquei nesse
+argumento.
 
 ---
