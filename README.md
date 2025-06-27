@@ -954,7 +954,7 @@ Basicamente eu simulo que os argumentos estão sendo enviados para mim com `sys.
 
 <p>
     <a
-        href="https://youtu.be/yt2wPLGMAA0"
+        href="images/diagrama.webp"
         target="_blank"
         rel="noopener noreferrer"
     >
