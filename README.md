@@ -4,6 +4,13 @@
 > o poder do Whisper da OpenAI para transcrever áudios e vídeos de forma
 > simples e eficiente.
 
+Esses são todos os links que menciono nos dois vídeos:
+
+- [(🚫 FAILED) whisper em tempo real via microfone](https://www.otaviomiranda.com.br/2025/whisper-live-sera-que-deu-certo/)
+- [logging — Logging facility for Python](https://docs.python.org/3/library/logging.html)
+- [sussu(rro): CLI educacional com OpenAI Whisper](https://www.otaviomiranda.com.br/2025/python-sussu-cli-openai-whisper/)
+- [openai / whisper](https://github.com/openai/whisper)
+
 ### 🎥 Parte 1 — CLI do Whisper (vídeo disponível a partir de 23/06/2025):
 
 - [Whisper OpenAI: Guia Completo de Transcrição com Inteligência Artificial (vídeo e áudio)](https://youtu.be/y15070biffg)
@@ -900,3 +907,307 @@ silêncios maiores que 1.5s que geraram texto suspeito**. Não toquei nesse
 argumento.
 
 ---
+
+## Usando o Whisper via código
+
+Para usar o `whisper` via código, é bem simples. Como informado no repositório deles, basta usar o seguinte para uso normal do whisper.
+
+```python
+import whisper
+
+model = whisper.load_model("turbo")
+result = model.transcribe("audio.mp3")
+print(result["text"])
+```
+
+Para um acesso de mais baixo nível:
+
+```python
+import whisper
+
+model = whisper.load_model("turbo")
+
+# load audio and pad/trim it to fit 30 seconds
+audio = whisper.load_audio("audio.mp3")
+audio = whisper.pad_or_trim(audio)
+
+# make log-Mel spectrogram and move to the same device as the model
+mel = whisper.log_mel_spectrogram(audio, n_mels=model.dims.n_mels).to(model.device)
+
+# detect the spoken language
+_, probs = model.detect_language(mel)
+print(f"Detected language: {max(probs, key=probs.get)}")
+
+# decode the audio
+options = whisper.DecodingOptions()
+result = whisper.decode(model, mel, options)
+
+# print the recognized text
+print(result.text)
+```
+
+### E como eu fiz meu código?
+
+Eu fiz o código de uma forma que eu continuasse usando todos os parâmetros do `whisper`, porém, adicionando minha própria lógica.
+
+Basicamente eu simulo que os argumentos estão sendo enviados para mim com `sys.argv` do Python. No Diagrama abaixo eu mostro o processo do "terminal" até chegar ao `argparse`, e do lado direito, como montei meu código também chamando o argparse.
+
+<p>
+    <a
+        href="https://youtu.be/yt2wPLGMAA0"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        <img
+            src="images/diagrama.webp"
+            alt="Diagrama exibindo como usei o `sys.argv` para simular o terminal no meu código"
+        />
+        <em
+            >Diagrama exibindo como usei o `sys.argv` para simular o terminal no meu código</em
+        >
+    </a>
+</p>
+
+Veja o código a seguir. Só para constar, tem um logger em outro módulo com o seguinte código.
+
+```python
+import logging
+
+from rich.logging import RichHandler
+
+logging.basicConfig(
+    level="CRITICAL",
+    format="%(message)s",
+    datefmt="[%H:%M]",
+    handlers=[
+        RichHandler(
+            show_time=True,
+            show_level=True,
+            rich_tracebacks=True,
+            omit_repeated_times=False,
+            markup=False,
+        )
+    ],
+)
+
+logger = logging.getLogger("rich")
+```
+
+Agora sim, vamos ver o código. Deixei vários comentário explicando tudo.
+
+```python
+import argparse
+from pathlib import Path
+
+import rich_argparse
+
+from sussu.basic_logger import logger
+
+# Example commands:
+#
+# sussu whisper ~/Desktop/videos/part_0004.mp4 --temperature 0 --beam_size 1 \
+# --device cpu --fp16 False --output_format srt --model tiny --language pt \
+# --output_dir ~/Desktop/videos/
+#
+# sussu one ~/Desktop/videos/part_0004.mp4 --temperature 0 --beam_size 1 \
+# --device cpu --fp16 False --output_format srt --model tiny --language pt \
+# --output_dir ~/Desktop/videos/
+#
+# sussu batch --input_dir ~/Desktop/videos/ --temperature 0 --beam_size 1
+# --device cpu --fp16 False --output_format srt --model tiny --language pt
+# -s video.mp4 part_0000.mp4 --skip_files part_0001.mp4
+# --output_dir 'this wont do anything here'
+
+
+# Essa função é basicamente um jeito de "enganar" o cli do `whisper`
+# para que ele "entenda" que está sendo chamado com determinados argumentos.
+def whisper_cli_runner(whisper_args: list[str]) -> None:
+    import sys
+
+    # `whisper` não tem stub, por isso o pyright vai gerar erro (ignorado)
+    from whisper.transcribe import cli as whisper_cli  # pyright: ignore
+
+    # Aqui está a malícia. Vamos fingir que o python está recebendo os argumento
+    # via sys.argv. Com isso o argparse entra em ação da mesma forma que
+    # entraria se estivesse sendo executado via linha de comando.
+    sys.argv = ["whisper", *whisper_args]
+    whisper_cli()
+
+
+# Essa é a nossa função que vai processar os arquivos usando o whisper original
+def batch_whisper(
+    input_dir: Path, whisper_raw_args: list[str], skip_files: list[str] | None = None
+) -> None:
+    # Vamos preencher essa lista com os dados que precisamos
+    whisper_args: list[str] = []
+
+    # As extensões abaixo podem não conter todas as extensões suportadas pelo
+    # ffmpeg, sinta-se à vontade para adicionar novas extensões
+    # fmt: off
+    allowed_extensions =  {
+        ".mp3", ".wav", ".flac", ".aac", ".m4a", ".ogg", ".opus", ".mp4", ".mkv",
+        ".webm", ".mov", ".avi", ".3gp", ".wmv",
+    }
+    # fmt: on
+
+    # Às vezes tem alguns arquivos na mesma pasta que são válidos, mas não
+    # queremos transcrever (eu só queria agilizar meus testes manuais)
+    if not skip_files:
+        skip_files = []
+
+    # Passamos em todos os arquivos da pasta enviada pelo usuário
+    for file in input_dir.iterdir():
+        skip_loop = False
+        ########## VAMOS PULAR ALGUNS ARQUIVOS PARA EVITAR ERROS ##########
+
+        # Pulamos quando é um subdiretório
+        if file.is_dir():
+            logger.warning(f"Directory not allowed: {file.name}")
+            continue
+
+        # Pulamos se a extensão não for permitida
+        if file.suffix not in allowed_extensions:
+            logger.error(f"File extension not allowed: {file.name}")
+            continue
+
+        # Pulamos também quando o usuário pede para pular aquele arquivo via -s
+        for skip_file in skip_files:
+            if str(file).endswith(skip_file):
+                logger.info(f"File skipped: {file.name}")
+                skip_loop = True
+
+        if skip_loop:
+            skip_loop = False
+            continue
+
+        ############ DAQUI EM DIANTE VAI PARA O WHISPER ##########
+
+        # O argumento posicional vai sozinho no primeiro índice
+        # depois os argumentos desconhecidos
+        whisper_args.extend([str(file), *whisper_raw_args])
+        logger.debug(f"audio set as {file!s}")
+
+        # Por fim, adicionamos o outdir para ser sempre a pasta onde está
+        # o arquivo original. Isso gera um arquivo de mesmo nome com a extensão
+        # `.srt`.
+        logger.debug(f"--output_dir set to {file.parent}")
+        whisper_args.extend(["--output_dir", str(file.parent)])
+
+        # Desativa o modo verboso do `whisper` por padrão para que a gente possa
+        # ver nossos logs. Se o user passar algo, usa o que ele passar.
+        if "--verbose" not in whisper_args:
+            whisper_args += ["--verbose", "False"]
+            logger.debug("--verbose set to False by default")
+
+        # Agora só chamar o whisper com os argumentos que montamos
+        logger.debug(f"whisper commands are: {whisper_args}")
+        logger.debug(f"Final command: whisper {' '.join(whisper_args)}")
+        whisper_cli_runner(whisper_args)
+
+        # Zeramos os argumentos para o próximo loop
+        whisper_args = []
+
+
+def build_argparse() -> argparse.ArgumentParser:
+    # Nosso main parser e o subparser para os comandos
+    parser = argparse.ArgumentParser(
+        prog="sussu", formatter_class=rich_argparse.RawDescriptionRichHelpFormatter
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    ########## WHISPER PARSER ##########
+
+    # Esse subparse só será usado como um wrapper do argparse do whisper.
+    # No final das contas, ele só vai chamar `whisper.transcribe.cli()`
+    whisper_parser = subparsers.add_parser(
+        "whisper",
+        help="Calls `whisper` directly",
+        conflict_handler="resolve",
+        aliases=["one"],
+        formatter_class=rich_argparse.RawDescriptionRichHelpFormatter,
+    )
+    whisper_parser.set_defaults(command="whisper")
+
+    # Esse argumento aqui é pra garantir que vamos chamar o help do whisper e
+    # não do nosso parser
+    whisper_parser.add_argument(
+        "-h", "--help", help="Shows `whisper` help.", action="store_true"
+    )
+
+    ########## NOSSOS PARSERS ##########
+    # Minha ideia aqui é criar um subparser `batch` que vai receber um diretório
+    # com arquivos de vídeo. Vamos passar em todos os arquivos do diretório e
+    # usar o whisper para transcrever cada um deles.
+
+    batch_parser = subparsers.add_parser(
+        "batch",
+        help="Process files with `whisper` in batch mode",
+        formatter_class=rich_argparse.RawDescriptionRichHelpFormatter,
+    )
+
+    # Só coloquei essa função aqui para ficar próxima do argumento e facilitar
+    # minha explicação na hora de gravar.
+    def parse_input_dir(path_str: str) -> Path:
+        path = Path(path_str)
+
+        if not path.is_dir():
+            msg = f"{path_str!r} is not a directory"
+            raise argparse.ArgumentTypeError(msg)
+
+        return path.resolve()
+
+    # Isso deverá ser uma pasta que contém arquivos de vídeo ou áudio
+    batch_parser.add_argument(
+        "--input_dir",
+        help="Directory with files to work with",
+        type=parse_input_dir,
+        required=True,
+    )
+
+    # Para testar, eu estava pulando um monte de arquivos para ir mais rápido
+    batch_parser.add_argument(
+        "-s",
+        "--skip_files",
+        help="Name of file(s) to skip",
+        action="extend",
+        nargs="+",
+        default=[],
+    )
+
+    # Essa foi a maneira mais simples e direta de remover output_dir dos
+    # unknown_args. Se isso fosse para o whisper, geraria conflito
+    batch_parser.add_argument("-o", "--output_dir", help=argparse.SUPPRESS)
+    return parser
+
+
+def run() -> None:
+    ########## PARSE KNOWN ARGS ##########
+
+    # Vamos receber argumentos que são conhecidos (os nossos), e desconhecidos.
+    # Argumentos desconhecidos serão repassados para o whisper cli.
+    parser = build_argparse()
+    args, unknown_args = parser.parse_known_args()
+
+    # Se o comando for whisper, passamos tudo direto para o whisper
+    if args.command == "whisper":
+        # Simula -h e --help
+        if args.help:
+            whisper_cli_runner(["--help"])
+            return
+
+        # Executa o whisper normal, só que por baixo de `sussu`
+        # Ex.: `sussu whisper audio.mp3` chama o cli original do `whisper` com
+        # o argumento `audio.mp3` (ou qualquer outro argumento)
+        whisper_cli_runner(unknown_args)
+        return
+
+    # Se o comando for `batch`, fazemos nosso trabalho
+    if args.command == "batch":
+        batch_whisper(args.input_dir, unknown_args, args.skip_files)
+
+
+if __name__ == "__main__":
+    run()
+```
+
+É só isso! Obrigado por ler.
