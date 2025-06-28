@@ -952,11 +952,15 @@ seguinte código.
 
 ```python
 import logging
+import os
 
 from rich.logging import RichHandler
 
+level_name = os.getenv("SUSSU_LOG_LEVEL", "INFO").upper()
+level = getattr(logging, level_name, logging.INFO)
+
 logging.basicConfig(
-    level="CRITICAL",
+    level=level,
     format="%(message)s",
     datefmt="[%H:%M]",
     handlers=[
@@ -972,6 +976,9 @@ logging.basicConfig(
 
 logger = logging.getLogger("rich")
 ```
+
+Defina a variável de ambiente `SUSSU_LOG_LEVEL` para controlar o nível de log.
+Se nenhuma for definida, o padrão será `INFO`.
 
 Agora sim, vamos ver o código. Deixei vários comentário explicando tudo.
 
