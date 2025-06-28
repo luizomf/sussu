@@ -6,19 +6,20 @@ from rich.logging import RichHandler
 level_name = os.getenv("SUSSU_LOG_LEVEL", "INFO").upper()
 level = getattr(logging, level_name, logging.INFO)
 
-logging.basicConfig(
-    level=level,
-    format="%(message)s",
-    datefmt="[%H:%M]",
-    handlers=[
-        RichHandler(
-            show_time=True,
-            show_level=True,
-            rich_tracebacks=True,
-            omit_repeated_times=False,
-            markup=False,
-        )
-    ],
-)
+logger = logging.getLogger("SUSSU")
+logger.setLevel(level)
 
-logger = logging.getLogger("rich")
+if not logger.hasHandlers():
+    handler = RichHandler(
+        show_time=True,
+        show_level=True,
+        rich_tracebacks=False,
+        omit_repeated_times=False,
+        markup=False,
+        enable_link_path=True,
+        level=level,
+        show_path=True,
+    )
+
+    handler.setFormatter(logging.Formatter(fmt="%(message)s", datefmt="[%H:%M]"))
+    logger.addHandler(handler)
