@@ -68,7 +68,8 @@ def batch_whisper(
             continue
 
         # Pulamos se a extensão não for permitida
-        if file.suffix not in allowed_extensions:
+        # Normaliza a extensão para evitar problemas de caixa alta
+        if file.suffix.lower() not in allowed_extensions:
             logger.error(f"File extension not allowed: {file.name}")
             continue
 
